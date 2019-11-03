@@ -5,8 +5,10 @@
  */
 
 #include "interface.hpp"
+
 #include "operatingSystem.hpp"
 #include "job.hpp"
+#include "memory.hpp"
 
 #include <iostream>
 
@@ -24,6 +26,16 @@ void Interface::menu() {
 	OperatingSystem OS = OperatingSystem();
 
 	std::cout << "\nO Sistema Operacional esta em execucao!" << std::endl;
+
+	Memory mem = Memory(100);
+	mem.allocate(21, 40);
+	mem.allocate(31, 20);
+	mem.allocate(11, 15);
+	mem.allocate(25, 25);
+	mem.free(31);
+	mem.free(11);
+	mem.log();
+
 
 	int menu;
 	enum options { EXIT, ADD, KILL, LOG };

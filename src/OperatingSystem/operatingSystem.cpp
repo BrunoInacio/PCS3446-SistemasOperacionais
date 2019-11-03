@@ -6,8 +6,6 @@
 
 #include "operatingSystem.hpp"
 
-#include <iostream>
-
 void OperatingSystem::killJob(int id) {
 }
 

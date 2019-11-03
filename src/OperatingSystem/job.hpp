@@ -16,14 +16,23 @@ public:
 	enum class State;
 
 private:
-	static int lastId;
 	const int id;
+	int currentCycle;
 
+	int totalCycles;
+	float memoryUsed;
 	Priority priority;
+	int totalIO;
+
+	int arriveTime;
+	int startTime;
+
 	State state;
+
+	static int lastId;
 };
 
-int Job::lastId = 0;
+inline int Job::lastId = 0;
 
 enum class Job::Priority {
 	Low,

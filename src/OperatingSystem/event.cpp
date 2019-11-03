@@ -1,7 +1,7 @@
 /**
- * job.cpp
+ * event.cpp
  * PCS 3216 - Sistemas Operacionais - 2019
  * Bruno Brandão Inácio
  */
 
-#include "job.hpp"
+#include "event.hpp"
