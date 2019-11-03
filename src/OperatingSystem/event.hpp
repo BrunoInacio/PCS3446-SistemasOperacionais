@@ -1,4 +1,3 @@
-
 /**
  * event.hpp
  * PCS 3216 - Sistemas Operacionais - 2019
@@ -7,9 +6,24 @@
 
 #pragma once
 
-class Event {
+class EventList {
 public:
-	enum class Error {
-		MEMORY_FULL,
-	};
+
+};
+
+
+enum class Event {
+	// Memória
+	MEMORY_FULL,
+
+	// Disco
+	DISK_UNAVAILABLE,
+	IO_COMPLETE
+};
+
+
+struct predictEvent {
+	int id;
+	double duration;
+	Event event;
 };

@@ -16,7 +16,8 @@ public:
 	void allocate(int id, int size);
 	void free(int id);
 
-	void  log();
+	void log();
+	std::unordered_map<int, int> getInfo() const;
 
 private:
 	int totalSpace;

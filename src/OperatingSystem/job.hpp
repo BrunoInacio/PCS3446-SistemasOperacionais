@@ -12,11 +12,12 @@ public:
 	Job();
 	~Job() {};
 
+	const int id;
+
 	enum class Priority;
 	enum class State;
 
 private:
-	const int id;
 	int currentCycle;
 
 	int totalCycles;

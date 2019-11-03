@@ -5,7 +5,6 @@
  */
 
 #include "memory.hpp"
-
 #include "event.hpp"
 
 #include <iostream>
@@ -17,7 +16,7 @@
  */
 void Memory::allocate(int id, int size) {
 	if (size > this->totalSpace - this->usedSpace)
-		throw Event::Error::MEMORY_FULL;
+		throw Event::MEMORY_FULL;
 
 	this->usedSpace += size;
 	this->mem.insert({ id, size });
@@ -45,4 +44,12 @@ void Memory::log() {
 	for (const auto& process : this->mem)
 		std::cout << std::setw(4) << process.first << std::setw(14) << process.second
 		<< " MB" << std::endl;
+}
+
+
+/**
+ * Retorna um unordered_map com as informações referentes à memória.
+ */
+std::unordered_map<int, int> Memory::getInfo() const {
+	return this->mem;
 }
