@@ -6,29 +6,36 @@
 
 #pragma once
 
+#include <tuple>
 
 class Job {
 public:
-	Job();
+	Job() : id(5) {};
 	~Job() {};
+
+	void process(double duration) {};
+	void complete() {};
 
 	const int id;
 
 	enum class Priority;
 	enum class State;
+	enum class Operation;
+
+	std::tuple<Job::Operation, double> getNextOperation();
 
 private:
 	int currentCycle;
 
 	int totalCycles;
 	float memoryUsed;
-	Priority priority;
+	Job::Priority priority;
 	int totalIO;
 
 	int arriveTime;
 	int startTime;
 
-	State state;
+	Job::State state;
 
 	static int lastId;
 };
@@ -36,17 +43,23 @@ private:
 inline int Job::lastId = 0;
 
 enum class Job::Priority {
-	Low,
-	Normal,
-	High,
-	Critical
+	LOW,
+	NORMAL,
+	HIGH,
+	CRITICAL,
 };
 
 enum class Job::State {
-	Submit,
-	WaitingResources,
-	Ready,
-	Running,
-	WaitingIO,
-	Done
+	SUBMIT,
+	WAITING_RESOURCES,
+	READY,
+	RUNNING,
+	WAITING_IO,
+	DONE,
+};
+
+enum class Job::Operation {
+	IO_READ,
+	IO_WRITE,
+	FINISH,
 };

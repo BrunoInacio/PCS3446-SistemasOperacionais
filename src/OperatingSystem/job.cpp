@@ -5,3 +5,7 @@
  */
 
 #include "job.hpp"
+
+std::tuple<Job::Operation, double> Job::getNextOperation() {
+	return std::tuple<Operation, double>(Job::Operation::FINISH, 0.0);
+}

@@ -14,21 +14,21 @@
  * Realiza a alocação do job referente ao 'id' e que possui tamanho 'size'.
  * Se a memória não possuir espaço livre o suficiente será lançada uma exceção para o SO.
  */
-void Memory::allocate(int id, int size) {
+void Memory::allocate(int jobID, int size) {
 	if (size > this->totalSpace - this->usedSpace)
-		throw Event::MEMORY_FULL;
+		throw Error::MEMORY_FULL;
 
 	this->usedSpace += size;
-	this->mem.insert({ id, size });
+	this->mem.insert({ jobID, size });
 }
 
 
 /**
  * Remove o job 'id' da memória e libera o espaço utilizado.
  */
-void Memory::free(int id) {
-	this->usedSpace -= this->mem.at(id);
-	this->mem.erase(id);
+void Memory::free(int jobID) {
+	this->usedSpace -= this->mem.at(jobID);
+	this->mem.erase(jobID);
 }
 
 

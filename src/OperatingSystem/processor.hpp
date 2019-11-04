@@ -7,8 +7,21 @@
 
 #pragma once
 
+#include "event.hpp"
+#include "job.hpp"
+
+#include <tuple>
+
 class Processor {
 public:
-	Processor() {};
+	Processor() : job(nullptr), isRunning(0) {};
 	~Processor() {};
+
+	std::tuple<int, Event, double> runJob(Job *job);
+	std::tuple<int, Event, double> releaseJob();
+	int finishJob();
+
+private:
+	Job *job;
+	bool isRunning;
 };

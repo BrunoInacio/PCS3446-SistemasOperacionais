@@ -10,6 +10,7 @@
 #include "job.hpp"
 #include "memory.hpp"
 #include "disk.hpp"
+#include "processor.hpp"
 
 #include <iostream>
 
@@ -28,26 +29,14 @@ void Interface::menu() {
 
 	std::cout << "\nO Sistema Operacional esta em execucao!" << std::endl;
 
-	Memory mem = Memory(100);
-	mem.allocate(21, 40);
-	mem.allocate(31, 20);
-	mem.allocate(11, 15);
-	mem.allocate(25, 25);
-	mem.free(31);
-	mem.free(11);
+	Processor cpu = Processor();
+	Job job = Job();
+	job.totalCycles = 30;
 
-	Disk disk = Disk(1000, 80, 20, 15);
-	std::cout << disk.processIO(1, Disk::IO::READ, 80) << std::endl;
-	disk.completeIO();
-	std::cout << disk.processIO(1, Disk::IO::WRITE, 40) << std::endl;
+	std::cout << job.totalCycles << std::endl;
+	cpu.runJob(&job);
+	std::cout << job.totalCycles << std::endl;
 
-	for (const auto& process : mem.getInfo())
-		std::cout << process.first << process.second << " MB" << std::endl;
-	auto a = mem.getInfo();
-	a[4] = 30;
-	for (const auto& process : a)
-		std::cout << process.first << process.second << " MB" << std::endl;
-	mem.log();
 
 
 	int menu;

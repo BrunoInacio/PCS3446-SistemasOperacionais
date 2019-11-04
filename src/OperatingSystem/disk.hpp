@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include "event.hpp"
+
+#include <tuple>
 
 /**
  * 'size': Tamanho do disco em MB.
@@ -17,12 +20,12 @@ class Disk {
 public:
 	Disk(double size, double readSpeed, double writeSpeed, double responseTime) :
 		size(size), readSpeed(readSpeed / 1000.), writeSpeed(writeSpeed / 1000.),
-		responseTime(responseTime), isRunning(0), id(0) {};
+		responseTime(responseTime), isRunning(0), jobID(0) {};
 	~Disk() {};
 
 	enum class IO;
 
-	double processIO(int id, Disk::IO operation, double size);
+	std::tuple<int, Event, double> processIO(int id, Disk::IO operation, double size);
 	int completeIO();
 
 private:
@@ -34,7 +37,7 @@ private:
 	double responseTime;
 
 	bool isRunning;
-	int id;
+	int jobID;
 
 	double readTime(double size) const;
 	double writeTime(double size) const;

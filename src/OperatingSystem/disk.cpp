@@ -5,28 +5,27 @@
  */
 
 #include "disk.hpp"
-#include "event.hpp"
 
 /**
  * Inicia o processamento de uma operação 'operation' de um arquivo
  * de tamanho 'size'. Enquanto a operação estiver em andamento, o disco 
  * é considerado ocupado e não pode fazer outra operação.
- * Retorna o tempo necessário para executar a operação solicitada.
+ * Retorna uma tupla referente ao próximo evento.
  */
-double Disk::processIO(int id, Disk::IO operation, double size) {
+std::tuple<int, Event, double> Disk::processIO(int jobID, Disk::IO operation, double size) {
 	if (this->isRunning)
-		throw Event::DISK_UNAVAILABLE;
+		throw Error::DISK_UNAVAILABLE;
 
 	switch (operation) {
 	case Disk::IO::READ:
 		this->isRunning = true;
-		this->id = id;
-		return this->readTime(size);
+		this->jobID = jobID;
+		return std::make_tuple(jobID, Event::IO_COMPLETE, this->readTime(size));
 
 	case Disk::IO::WRITE:
 		this->isRunning = true;
-		this->id = id;
-		return this->writeTime(size);
+		this->jobID = jobID;
+		return std::make_tuple(jobID, Event::IO_COMPLETE, this->writeTime(size));
 
 	default:
 		throw "Operação inválida no disco.";
@@ -36,11 +35,15 @@ double Disk::processIO(int id, Disk::IO operation, double size) {
 
 /**
  * Finaliza a operação de IO, liberando o uso do disco.
- * Retorna o 'id' do job que estava realizando operação no disco.
+ * Retorna o 'jobID' do job que estava realizando operação no disco.
  */
 int Disk::completeIO() {
 	this->isRunning = false;
-	return this->id;
+
+	auto jobID = this->jobID;
+	this->jobID = 0;
+
+	return jobID;
 }
 
 
