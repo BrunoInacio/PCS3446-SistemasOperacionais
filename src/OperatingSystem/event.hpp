@@ -15,6 +15,7 @@ public:
 enum class Event {
 	// Memória
 	MEM_ALLOC,
+	MEM_FREE,
 
 	// Disco
 	IO_START_READ,
@@ -23,10 +24,10 @@ enum class Event {
 
 	// Processor
 	CPU_RUN,
+	CPU_RELEASE,
 	CPU_DONE,
-	CPU_IO_RELEASE,
 
-	CPU_SWITCH_JOB,
+	CPU_INTERRUPT,
 };
 
 enum class Error {

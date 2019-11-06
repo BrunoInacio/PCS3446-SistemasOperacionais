@@ -14,14 +14,15 @@
 
 class Processor {
 public:
-	Processor() : job(nullptr), isRunning(0) {};
+	Processor() : job(nullptr), isRunning(0), time(0) {};
 	~Processor() {};
 
-	std::tuple<int, Event, double> runJob(Job *job);
-	std::tuple<int, Event, double> releaseJob();
-	int finishJob();
+	std::tuple<int, Event, int> run(Job *job, int time);
+	std::tuple<int, Event, int> release(int time);
+	std::tuple<int, Event, int> interrupt(int time);
 
 private:
 	Job *job;
 	bool isRunning;
+	int time;
 };

@@ -25,22 +25,22 @@ public:
 
 	enum class IO;
 
-	std::tuple<int, Event, double> processIO(int id, Disk::IO operation, double size);
-	int completeIO();
+	std::tuple<int, Event, int> processIO(int id, Disk::IO operation, double size);
+	std::tuple<int, Event, int> completeIO();
 
 private:
 	const double size;
+
+	bool isRunning;
+	int jobID;
 
 	double readSpeed;
 	double writeSpeed;
 
 	double responseTime;
 
-	bool isRunning;
-	int jobID;
-
-	double readTime(double size) const;
-	double writeTime(double size) const;
+	int readTime(double size) const;
+	int writeTime(double size) const;
 };
 
 enum class Disk::IO {

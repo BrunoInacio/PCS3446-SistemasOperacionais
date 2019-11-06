@@ -12,7 +12,7 @@
  * é considerado ocupado e não pode fazer outra operação.
  * Retorna uma tupla referente ao próximo evento.
  */
-std::tuple<int, Event, double> Disk::processIO(int jobID, Disk::IO operation, double size) {
+std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, double size) {
 	if (this->isRunning)
 		throw Error::DISK_UNAVAILABLE;
 
@@ -37,27 +37,27 @@ std::tuple<int, Event, double> Disk::processIO(int jobID, Disk::IO operation, do
  * Finaliza a operação de IO, liberando o uso do disco.
  * Retorna o 'jobID' do job que estava realizando operação no disco.
  */
-int Disk::completeIO() {
+std::tuple<int, Event, int> Disk::completeIO() {
 	this->isRunning = false;
 
 	auto jobID = this->jobID;
 	this->jobID = 0;
 
-	return jobID;
+	return std::make_tuple(jobID, Event::CPU_RUN, 0);
 }
 
 
 /**
  * Calcula o tempo de leitura de um arquivo de tamanho 'size'.
  */
-double Disk::readTime(double size) const {
-	return this->responseTime + size / this->readSpeed;
+int Disk::readTime(double size) const {
+	return static_cast<int>(this->responseTime + size / this->readSpeed);
 }
 
 
 /**
  * Calcula o tempo de escrita de um arquivo de tamanho 'size'.
  */
-double Disk::writeTime(double size) const {
-	return this->responseTime + size / this->writeSpeed;
+int Disk::writeTime(double size) const {
+	return static_cast<int>(this->responseTime + size / this->writeSpeed);
 }

@@ -31,11 +31,6 @@ void Interface::menu() {
 
 	Processor cpu = Processor();
 	Job job = Job();
-	job.totalCycles = 30;
-
-	std::cout << job.totalCycles << std::endl;
-	cpu.runJob(&job);
-	std::cout << job.totalCycles << std::endl;
 
 
 

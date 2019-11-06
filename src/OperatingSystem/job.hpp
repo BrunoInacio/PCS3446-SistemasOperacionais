@@ -13,8 +13,8 @@ public:
 	Job() : id(5) {};
 	~Job() {};
 
-	void process(double duration) {};
-	void complete() {};
+	void process(int duration) {};
+	bool complete() { return true; };
 
 	const int id;
 
@@ -22,7 +22,8 @@ public:
 	enum class State;
 	enum class Operation;
 
-	std::tuple<Job::Operation, double> getNextOperation();
+	std::tuple<Job::Operation, int> getNextOperation();
+	void completeNextOperation(Job::Operation) {};
 
 private:
 	int currentCycle;
