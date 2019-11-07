@@ -6,33 +6,32 @@
 
 #include "processor.hpp"
 
-
 /**
  * Inicia a execução de um 'job' e informa a próxima operação.
  * Retorna uma tupla referente ao próximo evento.
  */
 std::tuple<int, Event, int> Processor::run(Job *job, int time) {
-	if (this->isRunning)
-		throw Error::CPU_UNAVAILABLE;
-	
-	this->time = time;
-	this->job = job;
-	this->isRunning = true;
+    if (this->isRunning)
+        throw Error::CPU_UNAVAILABLE;
+    
+    this->time = time;
+    this->job = job;
+    this->isRunning = true;
 
-	std::tuple<int, Event, double> nextEvent;
+    std::tuple<int, Event, int> nextEvent;
 
-	switch (auto [operation, timeUntil] = this->job->getNextOperation(); operation) {
-	case Job::Operation::IO_READ:
-	case Job::Operation::IO_WRITE:
-	case Job::Operation::FINISH:
-		nextEvent = std::make_tuple(this->job->id, Event::CPU_RELEASE, timeUntil);
-		break;
+    switch (auto [operation, timeUntil] = this->job->getNextOperation(); operation) {
+    case Job::Operation::IO_READ:
+    case Job::Operation::IO_WRITE:
+    case Job::Operation::FINISH:
+        nextEvent = std::make_tuple(this->job->id, Event::CPU_RELEASE, timeUntil);
+        break;
 
-	default:
-		throw "Operação não reconhecida na CPU.";
-	}
+    default:
+        throw "Operação não reconhecida na CPU.";
+    }
 
-	return nextEvent;
+    return nextEvent;
 }
 
 
@@ -43,35 +42,35 @@ std::tuple<int, Event, int> Processor::run(Job *job, int time) {
  * Outros tipos de paradas devem ser tratadas como interrupções.
  */
 std::tuple<int, Event, int> Processor::release(int time) {
-	if (!isRunning)
-		throw "Tentativa de parar a CPU quando ela já estava parada.";
+    if (!isRunning)
+        throw "Tentativa de parar a CPU quando ela já estava parada.";
 
-	std::tuple<int, Event, int> nextEvent = std::make_tuple(this->job->id, Event::CPU_RUN, 0);
+    std::tuple<int, Event, int> nextEvent = std::make_tuple(this->job->id, Event::CPU_RUN, 0);
 
-	if (auto [operation, duration] = this->job->getNextOperation(); duration == time - this->time) {
-		switch (operation) {
-		case Job::Operation::IO_READ:
-			nextEvent = std::make_tuple(this->job->id, Event::IO_START_READ, 0);
-			break;
+    if (auto [operation, duration] = this->job->getNextOperation(); duration == time - this->time) {
+        switch (operation) {
+        case Job::Operation::IO_READ:
+            nextEvent = std::make_tuple(this->job->id, Event::IO_START_READ, 0);
+            break;
 
-		case Job::Operation::IO_WRITE:
-			nextEvent = std::make_tuple(this->job->id, Event::IO_START_WRITE, 0);
-			break;
+        case Job::Operation::IO_WRITE:
+            nextEvent = std::make_tuple(this->job->id, Event::IO_START_WRITE, 0);
+            break;
 
-		case Job::Operation::FINISH:
-			nextEvent = std::make_tuple(this->job->id, Event::MEM_FREE, 0);
-			break;
+        case Job::Operation::FINISH:
+            nextEvent = std::make_tuple(this->job->id, Event::MEM_FREE, 0);
+            break;
 
-		default:
-			throw "Operação de parada de processo não reconhecida na CPU.";
-		}
-	}
+        default:
+            throw "Operação de parada de processo não reconhecida na CPU.";
+        }
+    }
 
-	this->job->process(time - this->time);
+    this->job->process(time - this->time);
 
-	this->job = nullptr;
-	this->time = time;
-	this->isRunning = false;
+    this->job = nullptr;
+    this->time = time;
+    this->isRunning = false;
 
-	return nextEvent;
+    return nextEvent;
 }

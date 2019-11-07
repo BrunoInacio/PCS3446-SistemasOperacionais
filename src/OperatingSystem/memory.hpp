@@ -10,18 +10,18 @@
 
 class Memory {
 public:
-	Memory(int totalSpace) : totalSpace(totalSpace), usedSpace(0) {};
-	~Memory() {};
+    Memory(int totalSpace) : totalSpace(totalSpace), usedSpace(0) {};
+    ~Memory() {};
 
-	void allocate(int id, int size);
-	void free(int id);
+    const int totalSpace;
 
-	void log();
-	std::unordered_map<int, int> getInfo() const;
+    void allocate(int id, int size);
+    void free(int id);
+
+    void info();
+    std::unordered_map<int, int> getInfo() const;
 
 private:
-	int totalSpace;
-	int usedSpace;
-
-	std::unordered_map<int, int> mem;
+    int usedSpace;
+    std::unordered_map<int, int> mem;
 };

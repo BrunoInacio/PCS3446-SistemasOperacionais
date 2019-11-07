@@ -6,6 +6,20 @@
 
 #include "disk.hpp"
 
+#include <iostream>
+#include <iomanip>
+
+Disk::Disk(double size, double readSpeed, double writeSpeed, double responseTime)
+    : size(size),
+      readSpeed(readSpeed / 1000.),
+      writeSpeed(writeSpeed / 1000.),
+      responseTime(responseTime),
+      isRunning(0),
+      jobID(0),
+      totalRead(0),
+      totalWrite(0) {
+}
+
 /**
  * Inicia o processamento de uma operação 'operation' de um arquivo
  * de tamanho 'size'. Enquanto a operação estiver em andamento, o disco 
@@ -13,23 +27,28 @@
  * Retorna uma tupla referente ao próximo evento.
  */
 std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, double size) {
-	if (this->isRunning)
-		throw Error::DISK_UNAVAILABLE;
+    if (this->isRunning)
+        throw Error::DISK_UNAVAILABLE;
 
-	switch (operation) {
-	case Disk::IO::READ:
-		this->isRunning = true;
-		this->jobID = jobID;
-		return std::make_tuple(jobID, Event::IO_COMPLETE, this->readTime(size));
+    std::tuple<int, Event, int> nextEvent;
 
-	case Disk::IO::WRITE:
-		this->isRunning = true;
-		this->jobID = jobID;
-		return std::make_tuple(jobID, Event::IO_COMPLETE, this->writeTime(size));
+    switch (operation) {
+    case Disk::IO::READ:
+        this->totalRead += size;
+        nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->readTime(size));
 
-	default:
-		throw "Operação inválida no disco.";
-	}
+    case Disk::IO::WRITE:
+        this->totalWrite += size;
+        nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->writeTime(size));
+
+    default:
+        throw "Operação inválida no disco.";
+    }
+
+    this->isRunning = true;
+    this->jobID = jobID;
+
+    return nextEvent;
 }
 
 
@@ -38,12 +57,12 @@ std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, doubl
  * Retorna o 'jobID' do job que estava realizando operação no disco.
  */
 std::tuple<int, Event, int> Disk::completeIO() {
-	this->isRunning = false;
+    this->isRunning = false;
 
-	auto jobID = this->jobID;
-	this->jobID = 0;
+    auto jobID = this->jobID;
+    this->jobID = 0;
 
-	return std::make_tuple(jobID, Event::CPU_RUN, 0);
+    return std::make_tuple(jobID, Event::CPU_RUN, 0);
 }
 
 
@@ -51,7 +70,7 @@ std::tuple<int, Event, int> Disk::completeIO() {
  * Calcula o tempo de leitura de um arquivo de tamanho 'size'.
  */
 int Disk::readTime(double size) const {
-	return static_cast<int>(this->responseTime + size / this->readSpeed);
+    return static_cast<int>(this->responseTime + size / this->readSpeed);
 }
 
 
@@ -59,5 +78,18 @@ int Disk::readTime(double size) const {
  * Calcula o tempo de escrita de um arquivo de tamanho 'size'.
  */
 int Disk::writeTime(double size) const {
-	return static_cast<int>(this->responseTime + size / this->writeSpeed);
+    return static_cast<int>(this->responseTime + size / this->writeSpeed);
+}
+
+
+/**
+ * Exibe informações referentes ao disco.
+ */
+void Disk::info() {
+    std::cout << "=== Disco ===" << std::endl;
+    std::cout << "Tamanho total: " << this->size << "MB" << std::endl;
+    std::cout << "Velocidade de leitura: " << this->readSpeed << "MB/s" << std::endl;
+    std::cout << "Velocidade de escrita: " << this->writeSpeed << "MB/s" << std::endl;
+    std::cout << "Total de leituras feitas: " << this->totalRead << "MB" << std::endl;
+    std::cout << "Total de escritas feitas: " << this->totalWrite << "MB" << std::endl;
 }

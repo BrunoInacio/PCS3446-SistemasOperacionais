@@ -7,6 +7,6 @@
 #pragma once
 
 struct Interface {
-	void start();
-	void menu();
+    void start();
+    void menu();
 };

@@ -19,58 +19,64 @@
   * Inicia a interface.
   */
 void Interface::start() {
-	std::cout << "Bem vindo ao Sistema Operacional!" << std::endl;
-	this->menu();
+    std::cout << "Bem vindo ao Sistema Operacional!" << std::endl;
+    this->menu();
 }
 
 
 void Interface::menu() {
-	OperatingSystem OS = OperatingSystem();
+    OperatingSystem OS = OperatingSystem();
 
-	std::cout << "\nO Sistema Operacional esta em execucao!" << std::endl;
+    std::cout << "\nO Sistema Operacional esta em execucao!" << std::endl;
 
-	Processor cpu = Processor();
-	Job job = Job();
+    Job job = Job(200, 50, Job::Priority::NORMAL);
 
+    job.addOperation(std::make_tuple(50, Job::Operation::IO_READ, 10.0));
+    job.addOperation(std::make_tuple(150, Job::Operation::IO_WRITE, 10.0));
 
+    auto [a, b] = job.getNextOperation();
+    std::cout << b << std::endl;
+    job.process(50);
+    auto [c, d] = job.getNextOperation();
+    std::cout << d << std::endl;
 
-	int menu;
-	enum options { EXIT, ADD, KILL, LOG };
+    int menu;
+    enum options { EXIT, ADD, KILL, LOG };
 
-	while (true) {
-		std::cout << std::endl;
-		std::cout << EXIT << ". Sair" << std::endl;
-		std::cout << ADD << ". Adicionar jobs ao SO." << std::endl;
-		std::cout << KILL << ". Interromper um job em execucao." << std::endl;
-		std::cout << LOG << ". Visualizar informacoes sobre os jobs no SO." << std::endl;
-		std::cout << "\nDigite o numero da opcao desejada: ";
+    while (true) {
+        std::cout << std::endl;
+        std::cout << EXIT << ". Sair" << std::endl;
+        std::cout << ADD << ". Adicionar jobs ao SO." << std::endl;
+        std::cout << KILL << ". Interromper um job em execucao." << std::endl;
+        std::cout << LOG << ". Visualizar informacoes sobre os jobs no SO." << std::endl;
+        std::cout << "\nDigite o numero da opcao desejada: ";
 
-		switch (std::cin >> menu; menu) {
-		case ADD: {
-			break;
-		}
+        switch (std::cin >> menu; menu) {
+        case ADD: {
+            break;
+        }
 
-		case KILL: {
-			std::cout << "Digite a ID do job que deseja interromper: " << std::endl;
+        case KILL: {
+            std::cout << "Digite a ID do job que deseja interromper: " << std::endl;
 
-			int jobId;
-			std::cin >> jobId;
+            int jobId;
+            std::cin >> jobId;
 
-			OS.killJob(jobId);
-			break;
-		}
+            OS.killJob(jobId);
+            break;
+        }
 
-		case LOG:
-			OS.printJobs(); // 0xSTATE
-			break;
+        case LOG:
+            OS.printJobs(); // 0xSTATE
+            break;
 
-		case EXIT:
-		default:
-			return;
-		}
-	}
+        case EXIT:
+        default:
+            return;
+        }
+    }
 
-	return;
+    return;
 }
 
 
@@ -78,8 +84,8 @@ void Interface::menu() {
  * Realiza a chamada para a interface.
  */
 int main() {
-	Interface pc;
-	pc.start();
+    Interface pc;
+    pc.start();
 
-	return 0;
+    return 0;
 }

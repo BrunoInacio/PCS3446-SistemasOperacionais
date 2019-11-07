@@ -18,32 +18,36 @@
  */
 class Disk {
 public:
-	Disk(double size, double readSpeed, double writeSpeed, double responseTime) :
-		size(size), readSpeed(readSpeed / 1000.), writeSpeed(writeSpeed / 1000.),
-		responseTime(responseTime), isRunning(0), jobID(0) {};
-	~Disk() {};
+    Disk(double size, double readSpeed, double writeSpeed, double responseTime);
+    ~Disk() {};
 
-	enum class IO;
+    enum class IO;
 
-	std::tuple<int, Event, int> processIO(int id, Disk::IO operation, double size);
-	std::tuple<int, Event, int> completeIO();
+    const double size;
+
+    std::tuple<int, Event, int> processIO(int id, Disk::IO operation, double size);
+    std::tuple<int, Event, int> completeIO();
+
+    void info();
 
 private:
-	const double size;
 
-	bool isRunning;
-	int jobID;
+    bool isRunning;
+    int jobID;
 
-	double readSpeed;
-	double writeSpeed;
+    double readSpeed;
+    double writeSpeed;
 
-	double responseTime;
+    double responseTime;
 
-	int readTime(double size) const;
-	int writeTime(double size) const;
+    double totalRead;
+    double totalWrite;
+
+    int readTime(double size) const;
+    int writeTime(double size) const;
 };
 
 enum class Disk::IO {
-	READ,
-	WRITE
+    READ,
+    WRITE
 };

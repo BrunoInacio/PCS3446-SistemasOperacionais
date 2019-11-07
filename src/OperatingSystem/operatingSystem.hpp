@@ -8,9 +8,9 @@
 
 class OperatingSystem {
 public:
-	OperatingSystem() {};
-	~OperatingSystem() {};
+    OperatingSystem() {};
+    ~OperatingSystem() {};
 
-	void killJob(int id);
-	void printJobs();
+    void killJob(int id);
+    void printJobs();
 };
