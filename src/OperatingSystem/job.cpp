@@ -8,6 +8,7 @@
 
 #include <algorithm>
 
+
 /**
  * Construtor que recebe 'totalTime', 'memoryUsed', 'totalIO' e 'priority'.
  */
@@ -48,5 +49,5 @@ std::tuple<Job::Operation, int> Job::getNextOperation() {
         if (this->processedTime < time)
             return std::make_tuple(operation, time - this->processedTime);
 
-    return std::make_tuple(Job::Operation::FINISH, 0.0);
+    return std::make_tuple(Job::Operation::FINISH, 0);
 }

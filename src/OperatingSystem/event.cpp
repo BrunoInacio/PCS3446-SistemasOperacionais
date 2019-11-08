@@ -6,3 +6,62 @@
 
 #include "event.hpp"
 
+
+void EventControl::addJobs(int num) {
+
+}
+
+
+void EventControl::run(int time) {
+
+}
+
+
+void EventControl::memAlloc() {
+
+}
+
+
+void EventControl::memFree() {
+
+}
+
+
+void EventControl::IOStartRead() {
+
+}
+
+
+void EventControl::IOStartWrite() {
+
+}
+
+
+void EventControl::IOComplete() {
+
+}
+
+
+void EventControl::CPURun() {
+
+}
+
+
+void EventControl::CPURelease() {
+
+}
+
+
+void EventControl::CPUDone() {
+
+}
+
+
+void EventControl::SysLog() {
+
+}
+
+
+bool predictedEvent::operator<(const predictedEvent e) {
+    return this->time < e.time;
+}

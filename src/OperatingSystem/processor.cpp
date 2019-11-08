@@ -6,6 +6,7 @@
 
 #include "processor.hpp"
 
+
 /**
  * Inicia a execução de um 'job' e informa a próxima operação.
  * Retorna uma tupla referente ao próximo evento.

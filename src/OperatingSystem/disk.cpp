@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 
+
 Disk::Disk(double size, double readSpeed, double writeSpeed, double responseTime)
     : size(size),
       readSpeed(readSpeed / 1000.),

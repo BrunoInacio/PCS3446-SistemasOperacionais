@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iomanip>
 
+
 /**
  * Realiza a alocação do job referente ao 'id' e que possui tamanho 'size'.
  * Se a memória não possuir espaço livre o suficiente será lançada uma exceção para o SO.
