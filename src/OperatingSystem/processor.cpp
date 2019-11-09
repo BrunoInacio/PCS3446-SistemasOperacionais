@@ -6,6 +6,8 @@
 
 #include "processor.hpp"
 
+#include <iostream>
+
 
 /**
  * Inicia a execução de um 'job' e informa a próxima operação.
@@ -74,4 +76,18 @@ std::tuple<int, Event, int> Processor::release(int time) {
     this->isRunning = false;
 
     return nextEvent;
+}
+
+/**
+ * Exibe informações referentes ao processador.
+ */
+void Processor::info() {
+    std::cout << "=== Processador ===" << std::endl;
+    std::cout << "Tempo total de processamento: " << this->time << "ms." << std::endl;
+    if (this->isRunning)
+        std::cout << "Job atual: " << this->job->id << "." << std::endl;
+    else
+        std::cout << "Sem execucao no momento." << std::endl;
+
+    std::cout << std::endl;
 }

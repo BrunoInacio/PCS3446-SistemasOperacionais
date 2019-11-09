@@ -20,6 +20,8 @@ public:
     std::tuple<int, Event, int> run(Job *job, int time);
     std::tuple<int, Event, int> release(int time);
 
+    void info();
+
 private:
     Job *job;
     bool isRunning;

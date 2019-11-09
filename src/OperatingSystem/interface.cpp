@@ -6,11 +6,11 @@
 
 #include "interface.hpp"
 
-#include "operatingSystem.hpp"
-#include "job.hpp"
+#include "event.hpp"
 #include "memory.hpp"
 #include "disk.hpp"
 #include "processor.hpp"
+#include "job.hpp"
 
 #include <iostream>
 
@@ -20,54 +20,63 @@
   */
 void Interface::start() {
     std::cout << "Bem vindo ao Sistema Operacional!" << std::endl;
+    this->addHardware();
+
     this->menu();
 }
 
 
+/**
+ * Adiciona hardware para o sistema que será simulado.
+ */
+void Interface::addHardware() {
+    this->OS.addProcessor(Processor());
+    this->OS.addMemory(Memory(2000));
+    this->OS.addDisk(Disk(100E3, 80E3, 80E3, 15));
+}
+
+
+/**
+ * Menu para controle do Sistema Operacional.
+ */
 void Interface::menu() {
-    OperatingSystem OS = OperatingSystem();
-
-    std::cout << "\nO Sistema Operacional esta em execucao!" << std::endl;
-
-    Job job = Job(200, 50, Job::Priority::NORMAL);
-
-    job.addOperation(std::make_tuple(50, Job::Operation::IO_READ, 10.0));
-    job.addOperation(std::make_tuple(150, Job::Operation::IO_WRITE, 10.0));
-
-    auto [a, b] = job.getNextOperation();
-    std::cout << b << std::endl;
-    job.process(50);
-    auto [c, d] = job.getNextOperation();
-    std::cout << d << std::endl;
-
     int menu;
-    enum options { EXIT, ADD, KILL, LOG };
+    enum options { EXIT, ADD, RUN, JOBS, INFO };
 
     while (true) {
         std::cout << std::endl;
         std::cout << EXIT << ". Sair" << std::endl;
         std::cout << ADD << ". Adicionar jobs ao SO." << std::endl;
-        std::cout << KILL << ". Interromper um job em execucao." << std::endl;
-        std::cout << LOG << ". Visualizar informacoes sobre os jobs no SO." << std::endl;
+        std::cout << RUN << ". Rodar simulação." << std::endl;
+        std::cout << JOBS << ". Visualizar informacoes sobre os jobs no SO." << std::endl;
+        std::cout << INFO << ". Visualizar informacoes sobre o uso do sistema." << std::endl;
         std::cout << "\nDigite o numero da opcao desejada: ";
 
         switch (std::cin >> menu; menu) {
-        case ADD: {
+        case ADD:
+            std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
+
+            int numJobs;
+            std::cin >> numJobs;
+
+            this->events.addStochasticJobs(10);
             break;
-        }
 
-        case KILL: {
-            std::cout << "Digite a ID do job que deseja interromper: " << std::endl;
+        case RUN:
+            std::cout << "Por quanto tempo deseja executar o sistema operacional?" << std::endl;
 
-            int jobId;
-            std::cin >> jobId;
+            int time;
+            std::cin >> time;
 
-            OS.killJob(jobId);
+            this->events.run(time);
             break;
-        }
 
-        case LOG:
-            OS.printJobs(); // 0xSTATE
+        case JOBS:
+            this->events.infoJobs();
+            break;
+
+        case INFO:
+            this->OS.info();
             break;
 
         case EXIT:

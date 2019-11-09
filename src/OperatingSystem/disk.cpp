@@ -37,10 +37,12 @@ std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, doubl
     case Disk::IO::READ:
         this->totalRead += size;
         nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->readTime(size));
+        break;
 
     case Disk::IO::WRITE:
         this->totalWrite += size;
         nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->writeTime(size));
+        break;
 
     default:
         throw "Operação inválida no disco.";
@@ -93,4 +95,6 @@ void Disk::info() {
     std::cout << "Velocidade de escrita: " << this->writeSpeed << "MB/s" << std::endl;
     std::cout << "Total de leituras feitas: " << this->totalRead << "MB" << std::endl;
     std::cout << "Total de escritas feitas: " << this->totalWrite << "MB" << std::endl;
+
+    std::cout << std::endl;
 }

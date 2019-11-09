@@ -45,6 +45,8 @@ void Memory::info() {
     for (const auto& process : this->mem)
         std::cout << std::setw(4) << process.first << std::setw(14) << process.second
         << " MB" << std::endl;
+
+    std::cout << std::endl;
 }
 
 
