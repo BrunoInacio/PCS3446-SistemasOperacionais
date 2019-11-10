@@ -36,3 +36,21 @@ enum class Error {
     // Processador
     CPU_UNAVAILABLE,
 };
+
+
+enum class State {
+    SUBMIT,
+    WAITING_RESOURCES,
+    READY,
+    RUNNING,
+    WAITING_IO,
+    DONE,
+};
+
+
+enum class Priority {
+    LOW,
+    NORMAL,
+    HIGH,
+    CRITICAL,
+};

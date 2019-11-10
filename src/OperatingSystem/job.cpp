@@ -12,13 +12,13 @@
 /**
  * Construtor que recebe 'totalTime', 'memoryUsed', 'totalIO' e 'priority'.
  */
-Job::Job(int totalTime, double memoryUsed, Job::Priority priority)
+Job::Job(int totalTime, double memoryUsed, Priority priority)
     : totalTime(totalTime),
       memoryUsed(memoryUsed),
       priority(priority),
       id(++lastId),
       processedTime(0),
-      state(Job::State::SUBMIT) {
+      state(State::SUBMIT) {
     this->operations.push_back(std::make_tuple(totalTime, Job::Operation::FINISH, 0.0));
 }
 

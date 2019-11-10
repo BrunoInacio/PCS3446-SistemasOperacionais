@@ -6,24 +6,24 @@
 
 #pragma once
 
+#include "event.hpp"
+
 #include <tuple>
 #include <vector>
 
 class Job {
 public:
     enum class Operation;
-    enum class Priority;
-    enum class State;
 
-    Job(int totalTime, double memoryUsed, Job::Priority priority);
+    Job(int totalTime, double memoryUsed, Priority priority);
     ~Job() {};
 
     const int id;
     const int totalTime;
     const double memoryUsed;
-    const Job::Priority priority;
+    const Priority priority;
 
-    Job::State state;
+    State state;
 
     void addOperation(std::tuple<int, Job::Operation, double>);
     void process(int duration);
@@ -45,18 +45,3 @@ enum class Job::Operation {
     FINISH,
 };
 
-enum class Job::Priority {
-    LOW,
-    NORMAL,
-    HIGH,
-    CRITICAL,
-};
-
-enum class Job::State {
-    SUBMIT,
-    WAITING_RESOURCES,
-    READY,
-    RUNNING,
-    WAITING_IO,
-    DONE,
-};

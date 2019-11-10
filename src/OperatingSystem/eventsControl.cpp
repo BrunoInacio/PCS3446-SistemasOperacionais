@@ -21,11 +21,10 @@ void EventsControl::run(int duration) {
     try {
         while (!this->events.empty()) {
             auto e = this->events.front();
+            this->events.pop_front();
             this->time = e.time;
 
             (this->*EventsControl::actions.at(e.event))();
-
-            this->events.pop_front();
         }
     }
     catch (std::string err) {
@@ -45,13 +44,14 @@ void EventsControl::addEvent(EventsControl::PredictedEvent event) {
 
 void EventsControl::addStochasticJobs(int num) {
     for (auto i = 0; i < num; i++) {
-        Job job = Job(10, 20, Job::Priority::NORMAL);
+        Job job = Job(10, 20, Priority::NORMAL);
         int startTime = num;
         
         this->jobs.insert({ job.id, job });
         this->addEvent({ job.id, startTime, Event::MEM_ALLOC });
     }
 }
+
 
 void EventsControl::memAlloc() {
     std::cout << "memAlloc" << std::endl;
@@ -109,26 +109,33 @@ bool EventsControl::PredictedEvent::operator<(const PredictedEvent e) {
 }
 
 
+/**
+ * Exibe informação sobre todos os jobs no sistema.
+ */
 void EventsControl::infoJobs() {
     std::cout << "=== JOBS ===" << std::endl;
-    std::cout << " ID | PRIORITY | STATUS | TIME NEEDED | MEMORY NEEDED" << std::endl;
+    std::cout << " ID | PRIORITY |            STATUS | TIME NEEDED | MEMORY NEEDED" << std::endl;
 
     for (const auto& [jobID, job] : this->jobs)
         std::cout << std::setw(3) << job.id 
-            << std::setw(11) << (int)job.priority
-            << std::setw(9) << (int)job.state
+            << std::setw(11) << EventsControl::translatePriority.at(job.priority)
+            << std::setw(20) << EventsControl::translateState.at(job.state)
             << std::setw(14) << job.totalTime
             << std::setw(16) << job.memoryUsed
             << std::endl;
 }
 
+
+/**
+ * Exibe informações sobre os futuros eventos.
+ */
 void EventsControl::info() {
     std::cout << "=== FUTUROS EVENTOS ===" << std::endl;
-    std::cout << " JOB ID |         EVENT |    TIME" << std::endl;
+    std::cout << " JOB ID |          EVENT |    TIME" << std::endl;
 
     for (const auto& event : this->events)
         std::cout << std::setw(7) << event.jobID
-        << std::setw(16) << (int)event.event
+        << std::setw(17) << EventsControl::translateEvent.at(event.event)
         << std::setw(10) << event.time
         << std::endl;
 }
