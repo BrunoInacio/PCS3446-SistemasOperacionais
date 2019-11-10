@@ -41,34 +41,37 @@ void Interface::addHardware() {
  */
 void Interface::menu() {
     int menu;
-    enum options { EXIT, ADD, RUN, JOBS, INFO };
+    enum options { EXIT, ADD, RUN, EVENTS, JOBS, INFO };
 
     while (true) {
         std::cout << std::endl;
         std::cout << EXIT << ". Sair" << std::endl;
         std::cout << ADD << ". Adicionar jobs ao SO." << std::endl;
-        std::cout << RUN << ". Rodar simulação." << std::endl;
-        std::cout << JOBS << ". Visualizar informacoes sobre os jobs no SO." << std::endl;
+        std::cout << RUN << ". Rodar simulacao." << std::endl;
+        std::cout << EVENTS << ". Visualizar informacoes sobre futuros eventos." << std::endl;
+        std::cout << JOBS << ". Visualizar informacoes sobre todos os jobs." << std::endl;
         std::cout << INFO << ". Visualizar informacoes sobre o uso do sistema." << std::endl;
         std::cout << "\nDigite o numero da opcao desejada: ";
 
         switch (std::cin >> menu; menu) {
         case ADD:
-            std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
-
             int numJobs;
+            std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
             std::cin >> numJobs;
 
-            this->events.addStochasticJobs(10);
+            this->events.addStochasticJobs(numJobs);
             break;
 
         case RUN:
-            std::cout << "Por quanto tempo deseja executar o sistema operacional?" << std::endl;
-
             int time;
+            std::cout << "Por quanto tempo deseja executar o sistema operacional?" << std::endl;
             std::cin >> time;
 
             this->events.run(time);
+            break;
+
+        case EVENTS:
+            this->events.info();
             break;
 
         case JOBS:

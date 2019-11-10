@@ -22,7 +22,7 @@ enum class Event {
     CPU_DONE,
 
     // System
-    SYS_LOG,
+    SYS_PAUSE,
 };
 
 

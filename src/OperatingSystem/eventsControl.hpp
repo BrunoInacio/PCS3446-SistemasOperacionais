@@ -10,28 +10,33 @@
 #include "operatingSystem.hpp"
 #include "job.hpp"
 
-#include <vector>
+#include <deque>
 #include <unordered_map>
 
 
 class EventsControl {
 public:
+    EventsControl() : time(0) {}
+
     void addStochasticJobs(int num);
     void run(int time);
     void infoJobs();
+    void info();
 
 private:
+    int time;
     std::unordered_map<int, Job> jobs;
 
     struct PredictedEvent {
         int jobID;
-        double time;
+        int time;
         Event event;
 
         bool operator <(const PredictedEvent e);
     };
 
-    std::vector<PredictedEvent> events;
+    void addEvent(PredictedEvent event);
+    std::deque<PredictedEvent> events;
 
     void memAlloc();
     void memFree();
@@ -44,7 +49,7 @@ private:
     void CPURelease();
     void CPUDone();
 
-    void SysLog();
+    void sysPause();
 
     static const std::unordered_map<Event, void (EventsControl::*)()> actions;
 };
@@ -61,5 +66,5 @@ inline const std::unordered_map<Event, void (EventsControl::*)()> EventsControl:
     { Event::CPU_RELEASE,       &EventsControl::CPURelease },
     { Event::CPU_DONE,          &EventsControl::CPUDone },
 
-    { Event::SYS_LOG,           &EventsControl::SysLog },
+    { Event::SYS_PAUSE,          &EventsControl::sysPause },
 };

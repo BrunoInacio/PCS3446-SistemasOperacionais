@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\OperatingSystem\disk.cpp" />
-    <ClCompile Include="..\src\OperatingSystem\event.cpp" />
+    <ClCompile Include="..\src\OperatingSystem\eventsControl.cpp" />
     <ClCompile Include="..\src\OperatingSystem\interface.cpp" />
     <ClCompile Include="..\src\OperatingSystem\job.cpp" />
     <ClCompile Include="..\src\OperatingSystem\memory.cpp" />
@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\OperatingSystem\disk.hpp" />
     <ClInclude Include="..\src\OperatingSystem\event.hpp" />
+    <ClInclude Include="..\src\OperatingSystem\eventsControl.hpp" />
     <ClInclude Include="..\src\OperatingSystem\interface.hpp" />
     <ClInclude Include="..\src\OperatingSystem\job.hpp" />
     <ClInclude Include="..\src\OperatingSystem\memory.hpp" />
