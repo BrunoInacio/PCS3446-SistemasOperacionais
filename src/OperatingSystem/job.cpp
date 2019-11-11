@@ -44,10 +44,10 @@ void Job::process(int duration) {
  * Obtém a próxima operação que deve ser realizada pelo 'job'.
  * Por exemplo, operações de IO ou finalização do processamento.
  */
-std::tuple<Job::Operation, int> Job::getNextOperation() {
+std::tuple<int, Job::Operation, double> Job::getNextOperation() {
     for (const auto [time, operation, value]: this->operations)
         if (this->processedTime < time)
-            return std::make_tuple(operation, time - this->processedTime);
+            return std::make_tuple(time - this->processedTime, operation, value);
 
-    return std::make_tuple(Job::Operation::FINISH, 0);
+    return std::make_tuple(0, Job::Operation::FINISH, 0.0);
 }

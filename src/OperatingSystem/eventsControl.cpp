@@ -7,7 +7,7 @@
 #include "eventsControl.hpp"
 
 #include <algorithm>
-#include <random>
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -36,20 +36,9 @@ void EventsControl::run(int duration) {
 /**
  * Adiciona 'event' à máquina.
  */
-void EventsControl::addEvent(EventsControl::PredictedEvent event) {
+void EventsControl::addEvent(PredictedEvent event) {
     auto position = std::lower_bound(this->events.begin(), this->events.end(), event);
     this->events.insert(position, event);
-}
-
-
-void EventsControl::addStochasticJobs(int num) {
-    for (auto i = 0; i < num; i++) {
-        Job job = Job(10, 20, Priority::NORMAL);
-        int startTime = num;
-        
-        this->jobs.insert({ job.id, job });
-        this->addEvent({ job.id, startTime, Event::MEM_ALLOC });
-    }
 }
 
 
@@ -102,31 +91,6 @@ void EventsControl::sysPause() {
 
 
 /**
- * Sobrecarga do operador '<' para ordenação da lista de eventos por tempo.
- */
-bool EventsControl::PredictedEvent::operator<(const PredictedEvent e) {
-    return this->time < e.time;
-}
-
-
-/**
- * Exibe informação sobre todos os jobs no sistema.
- */
-void EventsControl::infoJobs() {
-    std::cout << "=== JOBS ===" << std::endl;
-    std::cout << " ID | PRIORITY |            STATUS | TIME NEEDED | MEMORY NEEDED" << std::endl;
-
-    for (const auto& [jobID, job] : this->jobs)
-        std::cout << std::setw(3) << job.id 
-            << std::setw(11) << EventsControl::translatePriority.at(job.priority)
-            << std::setw(20) << EventsControl::translateState.at(job.state)
-            << std::setw(14) << job.totalTime
-            << std::setw(16) << job.memoryUsed
-            << std::endl;
-}
-
-
-/**
  * Exibe informações sobre os futuros eventos.
  */
 void EventsControl::info() {
@@ -135,7 +99,7 @@ void EventsControl::info() {
 
     for (const auto& event : this->events)
         std::cout << std::setw(7) << event.jobID
-        << std::setw(17) << EventsControl::translateEvent.at(event.event)
+        << std::setw(17) << Translate::event.at(event.event)
         << std::setw(10) << event.time
         << std::endl;
 }

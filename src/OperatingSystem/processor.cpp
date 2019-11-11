@@ -13,7 +13,7 @@
  * Inicia a execução de um 'job' e informa a próxima operação.
  * Retorna uma tupla referente ao próximo evento.
  */
-std::tuple<int, Event, int> Processor::run(Job *job, int time) {
+PredictedEvent Processor::run(Job *job, int time) {
     if (this->isRunning)
         throw Error::CPU_UNAVAILABLE;
     
@@ -21,13 +21,16 @@ std::tuple<int, Event, int> Processor::run(Job *job, int time) {
     this->job = job;
     this->isRunning = true;
 
-    std::tuple<int, Event, int> nextEvent;
+    PredictedEvent nextEvent;
 
-    switch (auto [operation, timeUntil] = this->job->getNextOperation(); operation) {
+    switch (auto [timeUntil, operation, value] = this->job->getNextOperation(); operation) {
     case Job::Operation::IO_READ:
     case Job::Operation::IO_WRITE:
+        nextEvent = { this->job->id, timeUntil, Event::CPU_RELEASE };
+        break;
+
     case Job::Operation::FINISH:
-        nextEvent = std::make_tuple(this->job->id, Event::CPU_RELEASE, timeUntil);
+        nextEvent = { this->job->id, timeUntil, Event::CPU_DONE };
         break;
 
     default:
@@ -44,24 +47,24 @@ std::tuple<int, Event, int> Processor::run(Job *job, int time) {
  * operação onde é previsto que o 'job' seja interrompido.
  * Outros tipos de paradas devem ser tratadas como interrupções.
  */
-std::tuple<int, Event, int> Processor::release(int time) {
+PredictedEvent Processor::release(int time) {
     if (!isRunning)
         throw "Tentativa de parar a CPU quando ela já estava parada.";
 
-    std::tuple<int, Event, int> nextEvent = std::make_tuple(this->job->id, Event::CPU_RUN, 0);
+    PredictedEvent nextEvent = { this->job->id, 0, Event::CPU_RUN };
 
-    if (auto [operation, duration] = this->job->getNextOperation(); duration == time - this->time) {
+    if (auto [timeUntil, operation, value] = this->job->getNextOperation(); timeUntil == time - this->time) {
         switch (operation) {
         case Job::Operation::IO_READ:
-            nextEvent = std::make_tuple(this->job->id, Event::IO_START_READ, 0);
+            nextEvent = { this->job->id, 0, Event::IO_START_READ };
             break;
 
         case Job::Operation::IO_WRITE:
-            nextEvent = std::make_tuple(this->job->id, Event::IO_START_WRITE, 0);
+            nextEvent = { this->job->id, 0, Event::IO_START_WRITE };
             break;
 
         case Job::Operation::FINISH:
-            nextEvent = std::make_tuple(this->job->id, Event::MEM_FREE, 0);
+            nextEvent = { this->job->id, 0, Event::MEM_FREE };
             break;
 
         default:
@@ -83,7 +86,6 @@ std::tuple<int, Event, int> Processor::release(int time) {
  */
 void Processor::info() {
     std::cout << "=== Processador ===" << std::endl;
-    std::cout << "Tempo total de processamento: " << this->time << "ms." << std::endl;
     if (this->isRunning)
         std::cout << "Job atual: " << this->job->id << "." << std::endl;
     else

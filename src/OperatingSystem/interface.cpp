@@ -59,7 +59,7 @@ void Interface::menu() {
             std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
             std::cin >> numJobs;
 
-            this->events.addStochasticJobs(numJobs);
+            this->OS.addStochasticJobs(numJobs);
             break;
 
         case RUN:
@@ -75,7 +75,7 @@ void Interface::menu() {
             break;
 
         case JOBS:
-            this->events.infoJobs();
+            this->OS.infoJobs();
             break;
 
         case INFO:

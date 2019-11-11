@@ -15,8 +15,8 @@ public:
 
     const int totalSpace;
 
-    void allocate(int id, int size);
-    void free(int id);
+    void allocate(int jobID, int size);
+    void free(int jobID);
 
     void info();
     std::unordered_map<int, int> getInfo() const;

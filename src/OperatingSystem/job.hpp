@@ -28,7 +28,7 @@ public:
     void addOperation(std::tuple<int, Job::Operation, double>);
     void process(int duration);
 
-    std::tuple<Job::Operation, int> getNextOperation();
+    std::tuple<int, Job::Operation, double> getNextOperation();
 
 private:
     int processedTime;

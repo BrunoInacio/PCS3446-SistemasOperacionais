@@ -17,8 +17,8 @@ public:
     Processor() : job(nullptr), isRunning(0), time(0) {};
     ~Processor() {};
 
-    std::tuple<int, Event, int> run(Job *job, int time);
-    std::tuple<int, Event, int> release(int time);
+    PredictedEvent run(Job *job, int time);
+    PredictedEvent release(int time);
 
     void info();
 

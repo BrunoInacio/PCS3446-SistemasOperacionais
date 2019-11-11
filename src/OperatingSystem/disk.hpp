@@ -25,8 +25,8 @@ public:
 
     const double size;
 
-    std::tuple<int, Event, int> processIO(int id, Disk::IO operation, double size);
-    std::tuple<int, Event, int> completeIO();
+    PredictedEvent processIO(int id, Disk::IO operation, double size);
+    PredictedEvent completeIO();
 
     void info();
 

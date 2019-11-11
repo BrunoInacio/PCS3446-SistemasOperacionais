@@ -27,21 +27,21 @@ Disk::Disk(double size, double readSpeed, double writeSpeed, double responseTime
  * é considerado ocupado e não pode fazer outra operação.
  * Retorna uma tupla referente ao próximo evento.
  */
-std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, double size) {
+PredictedEvent Disk::processIO(int jobID, Disk::IO operation, double size) {
     if (this->isRunning)
         throw Error::DISK_UNAVAILABLE;
 
-    std::tuple<int, Event, int> nextEvent;
+    PredictedEvent nextEvent;
 
     switch (operation) {
     case Disk::IO::READ:
         this->totalRead += size;
-        nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->readTime(size));
+        nextEvent = { jobID, this->readTime(size), Event::IO_COMPLETE };
         break;
 
     case Disk::IO::WRITE:
         this->totalWrite += size;
-        nextEvent = std::make_tuple(jobID, Event::IO_COMPLETE, this->writeTime(size));
+        nextEvent = { jobID, this->writeTime(size), Event::IO_COMPLETE };
         break;
 
     default:
@@ -59,13 +59,13 @@ std::tuple<int, Event, int> Disk::processIO(int jobID, Disk::IO operation, doubl
  * Finaliza a operação de IO, liberando o uso do disco.
  * Retorna o 'jobID' do job que estava realizando operação no disco.
  */
-std::tuple<int, Event, int> Disk::completeIO() {
+PredictedEvent Disk::completeIO() {
     this->isRunning = false;
 
     auto jobID = this->jobID;
     this->jobID = 0;
 
-    return std::make_tuple(jobID, Event::CPU_RUN, 0);
+    return { jobID, 0, Event::CPU_RUN };
 }
 
 
