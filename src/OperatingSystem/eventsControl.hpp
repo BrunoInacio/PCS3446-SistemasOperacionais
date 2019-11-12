@@ -43,10 +43,14 @@ private:
     void CPURelease(PredictedEvent e);
     void CPUDone(PredictedEvent e);
 
+    void jobArrive(PredictedEvent e);
+    void jobDone(PredictedEvent e);
+
     void sysPause(PredictedEvent e);
 
     static const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> actions;
 };
+
 
 inline const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> EventsControl::actions = {
     { Event::MEM_ALLOC,         &EventsControl::memAlloc        },
@@ -59,6 +63,9 @@ inline const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> 
     { Event::CPU_RUN,           &EventsControl::CPURun          },
     { Event::CPU_RELEASE,       &EventsControl::CPURelease      },
     { Event::CPU_DONE,          &EventsControl::CPUDone         },
+
+    { Event::JOB_ARRIVE,        &EventsControl::jobArrive       },
+    { Event::JOB_DONE,          &EventsControl::jobDone         },
 
     { Event::SYS_PAUSE,         &EventsControl::sysPause        },
 };

@@ -25,17 +25,14 @@ public:
     void addProcessor(Processor &&p);
     void addMemory(Memory &&m);
     void addDisk(Disk &&d);
+    void addJob(Job &&j);
 
     void info();
     void infoHardware();
 
-    //static std::tuple<int, Job> stochasticJob(int maxTime);
-
-
 private:
-    std::unordered_map<int, Job> jobs;
+    std::unordered_map<int, std::unique_ptr<Job>> jobs;
 
-    std::deque<PredictedEvent> events;
     std::deque<PredictedEvent> jobToProcess;
     std::deque<PredictedEvent> jobToMemory;
     std::deque<PredictedEvent> jobToDisk;
@@ -43,6 +40,4 @@ private:
     std::unique_ptr<Processor> processor;
     std::unique_ptr<Memory> memory;
     std::unique_ptr<Disk> disk;
-
-    static const std::unordered_map<Event, void (OperatingSystem::*)(PredictedEvent)> actions;
 };

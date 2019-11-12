@@ -15,7 +15,7 @@ class Job {
 public:
     enum class Operation;
 
-    Job(int totalTime, double memoryUsed, Priority priority);
+    Job(int totalTime, int memoryUsed, Priority priority);
     ~Job() {};
 
     const int id;

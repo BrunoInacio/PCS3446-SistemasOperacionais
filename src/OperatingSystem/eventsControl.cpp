@@ -13,10 +13,6 @@
 #include <string>
 
 
-void EventsControl::addOS(OperatingSystem &&OS) {
-    this->OS = std::make_unique<OperatingSystem>(OS);
-}
-
 /**
  * Roda a máquina por um determinado intervalo de tempo 'time'.
  */
@@ -44,6 +40,24 @@ void EventsControl::run(int duration) {
 void EventsControl::addEvent(PredictedEvent event) {
     auto position = std::lower_bound(this->events.begin(), this->events.end(), event);
     this->events.insert(position, event);
+}
+
+
+/**
+ * Adiciona um Sistema operacional à máquina.
+ */
+void EventsControl::addOS(OperatingSystem&& OS) {
+    this->OS = std::make_unique<OperatingSystem>(OS);
+}
+
+
+void EventsControl::jobArrive(PredictedEvent e) {
+    this->OS->addJob(Job(100, 100, Priority::NORMAL));
+}
+
+
+void EventsControl::jobDone(PredictedEvent e) {
+    std::cout << "jobDone" << std::endl;
 }
 
 

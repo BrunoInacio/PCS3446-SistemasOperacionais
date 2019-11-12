@@ -12,7 +12,7 @@
 /**
  * Construtor que recebe 'totalTime', 'memoryUsed', 'totalIO' e 'priority'.
  */
-Job::Job(int totalTime, double memoryUsed, Priority priority)
+Job::Job(int totalTime, int memoryUsed, Priority priority)
     : totalTime(totalTime),
       memoryUsed(memoryUsed),
       priority(priority),
