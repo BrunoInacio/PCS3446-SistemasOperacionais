@@ -23,8 +23,25 @@ enum class Event {
     CPU_RELEASE,
     CPU_DONE,
 
+    // Job
+    JOB_ARRIVE,
+    JOB_DONE,
+
     // System
     SYS_PAUSE,
+};
+
+
+struct PredictedEvent {
+    int jobID;
+    int time;
+    Event event;
+
+    double size;
+
+    bool operator <(const PredictedEvent e) {
+        return this->time < e.time;
+    }
 };
 
 
@@ -58,19 +75,6 @@ enum class Priority {
 };
 
 
-struct PredictedEvent {
-    int jobID;
-    int time;
-    Event event;
-
-    double size;
-
-    bool operator <(const PredictedEvent e) {
-        return this->time < e.time;
-    }
-};
-
-
 class Translate {
 public:
     static const std::unordered_map<Event, std::string> event;
@@ -89,6 +93,9 @@ inline const std::unordered_map<Event, std::string> Translate::event = {
     { Event::CPU_RUN,           "CPU_RUN"           },
     { Event::CPU_RELEASE,       "CPU_RELEASE"       },
     { Event::CPU_DONE,          "CPU_DONE"          },
+
+    { Event::JOB_ARRIVE,        "JOB_ARRIVE"        },
+    { Event::JOB_DONE,          "JOB_DONE"          },
 
     { Event::SYS_PAUSE,         "SYS_PAUSE"         },
 };

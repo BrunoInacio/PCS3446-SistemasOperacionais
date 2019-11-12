@@ -6,46 +6,25 @@
 
 #include "operatingSystem.hpp"
 
+#include <algorithm>
+
+#include <random>
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 
 OperatingSystem::OperatingSystem()
-    :processor(nullptr),
-     memory(nullptr),
-     disk(nullptr) {
-}
-
-void OperatingSystem::addProcessor(Processor &&p) {
-    this->processor = std::make_unique<Processor>(p);
-}
-
-
-void OperatingSystem::addMemory(Memory &&m) {
-    this->memory = std::make_unique<Memory>(m);
-}
-
-
-void OperatingSystem::addDisk(Disk &&d) {
-    this->disk = std::make_unique<Disk>(d);
-}
-
-
-void OperatingSystem::addStochasticJobs(int num) {
-    for (auto i = 0; i < num; i++) {
-        Job job = Job(10, 20, Priority::NORMAL);
-        int startTime = num;
-
-        this->jobs.insert({ job.id, job });
-        //this->addEvent({ job.id, startTime, Event::MEM_ALLOC });
-    }
+    : processor(nullptr),
+      memory(nullptr),
+      disk(nullptr) {
 }
 
 
 /**
  * Exibe informação sobre todos os jobs no sistema.
  */
-void OperatingSystem::infoJobs() {
+void OperatingSystem::info() {
     std::cout << "=== JOBS ===" << std::endl;
     std::cout << " ID | PRIORITY |            STATUS | TIME NEEDED | MEMORY NEEDED" << std::endl;
 
@@ -59,10 +38,47 @@ void OperatingSystem::infoJobs() {
 }
 
 
-void OperatingSystem::info() {
+void OperatingSystem::infoHardware() {
     std::cout << "Informações do Sistema Operacional no atual estado." << std::endl;
 
     this->processor->info();
     this->memory->info();
     this->disk->info();
+}
+
+
+/**
+ * Define um job com valores estocásticos baseados em uma distribuição
+ * estatística usual dos jobs.
+ */
+/*std::tuple<int, Job> OperatingSystem::stochasticJob(int maxTime) {
+    std::random_device r;
+
+    int time = 0;
+
+    return std::make_tuple(time, Job(10, 20, Priority::NORMAL));
+}*/
+
+
+/**
+ * Adiciona o processador que será utilizado pelo sistema.
+ */
+void OperatingSystem::addProcessor(Processor&& p) {
+    this->processor = std::make_unique<Processor>(p);
+}
+
+
+/**
+ * Adiciona a memória que será utilizada pelo sistema.
+ */
+void OperatingSystem::addMemory(Memory&& m) {
+    this->memory = std::make_unique<Memory>(m);
+}
+
+
+/**
+ * Adiciona o dsico que será utilizado pelo sistema.
+ */
+void OperatingSystem::addDisk(Disk&& d) {
+    this->disk = std::make_unique<Disk>(d);
 }

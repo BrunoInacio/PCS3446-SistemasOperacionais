@@ -11,8 +11,10 @@
 #include "disk.hpp"
 #include "processor.hpp"
 #include "job.hpp"
+#include "operatingSystem.hpp"
 
 #include <iostream>
+#include <random>
 
 
  /**
@@ -20,7 +22,7 @@
   */
 void Interface::start() {
     std::cout << "Bem vindo ao Sistema Operacional!" << std::endl;
-    this->addHardware();
+    this->addMachine();
 
     this->menu();
 }
@@ -29,10 +31,12 @@ void Interface::start() {
 /**
  * Adiciona hardware para o sistema que será simulado.
  */
-void Interface::addHardware() {
-    this->OS.addProcessor(Processor());
-    this->OS.addMemory(Memory(2000));
-    this->OS.addDisk(Disk(100E3, 80E3, 80E3, 15));
+void Interface::addMachine() {
+    this->events.addOS(OperatingSystem());
+
+    this->events.OS->addProcessor(Processor());
+    this->events.OS->addMemory(Memory(2000));
+    this->events.OS->addDisk(Disk(100E3, 80E3, 80E3, 15));
 }
 
 
@@ -41,7 +45,7 @@ void Interface::addHardware() {
  */
 void Interface::menu() {
     int menu;
-    enum options { EXIT, ADD, RUN, EVENTS, JOBS, INFO };
+    enum options { EXIT, ADD, RUN, EVENTS, JOBS, HARD };
 
     while (true) {
         std::cout << std::endl;
@@ -50,17 +54,29 @@ void Interface::menu() {
         std::cout << RUN << ". Rodar simulacao." << std::endl;
         std::cout << EVENTS << ". Visualizar informacoes sobre futuros eventos." << std::endl;
         std::cout << JOBS << ". Visualizar informacoes sobre todos os jobs." << std::endl;
-        std::cout << INFO << ". Visualizar informacoes sobre o uso do sistema." << std::endl;
+        std::cout << HARD << ". Visualizar informacoes sobre o uso do sistema." << std::endl;
         std::cout << "\nDigite o numero da opcao desejada: ";
 
         switch (std::cin >> menu; menu) {
         case ADD:
-            int numJobs;
+        {
+            int numJobs, maxTime;
+
             std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
             std::cin >> numJobs;
 
-            this->OS.addStochasticJobs(numJobs);
+            std::cout << "Qual o tempo maximo ate a chegada do ultimo job?" << std::endl;
+            std::cin >> maxTime;
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, maxTime);
+
+            for (auto i = 0; i < numJobs; i++)
+                this->events.addEvent({ 0, dis(gen), Event::JOB_ARRIVE });
+
             break;
+        }
 
         case RUN:
             int time;
@@ -75,11 +91,11 @@ void Interface::menu() {
             break;
 
         case JOBS:
-            this->OS.infoJobs();
+            this->events.OS->info();
             break;
 
-        case INFO:
-            this->OS.info();
+        case HARD:
+            this->events.OS->infoHardware();
             break;
 
         case EXIT:

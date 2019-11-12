@@ -9,41 +9,46 @@
 #include "event.hpp"
 #include "operatingSystem.hpp"
 
+#include <memory>
 #include <deque>
 #include <unordered_map>
 
 
 class EventsControl {
 public:
-    EventsControl() : time(0) {}
+    EventsControl() : time(0), OS(nullptr) {};
+    ~EventsControl() {};
 
     void run(int time);
+    void addEvent(PredictedEvent event);
+
     void info();
 
-    void addEvent(PredictedEvent event);
+    void addOS(OperatingSystem&& OS);
+    std::unique_ptr<OperatingSystem> OS;
 
 private:
     int time;
 
     std::deque<PredictedEvent> events;
 
-    void memAlloc();
-    void memFree();
+    void memAlloc(PredictedEvent e);
+    void memFree(PredictedEvent e);
 
-    void IOStartRead();
-    void IOStartWrite();
-    void IOComplete();
+    void IOStartRead(PredictedEvent e);
+    void IOStartWrite(PredictedEvent e);
+    void IOComplete(PredictedEvent e);
 
-    void CPURun();
-    void CPURelease();
-    void CPUDone();
+    void CPURun(PredictedEvent e);
+    void CPURelease(PredictedEvent e);
+    void CPUDone(PredictedEvent e);
 
-    void sysPause();
+    void sysPause(PredictedEvent e);
 
-    static const std::unordered_map<Event, void (EventsControl::*)()> actions;
+    static const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> actions;
 };
 
-inline const std::unordered_map<Event, void (EventsControl::*)()> EventsControl::actions = {
+inline const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> EventsControl::actions = {
     { Event::MEM_ALLOC,         &EventsControl::memAlloc        },
     { Event::MEM_FREE,          &EventsControl::memFree         },
 

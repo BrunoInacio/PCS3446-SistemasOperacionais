@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include "operatingSystem.hpp"
 #include "event.hpp"
 #include "eventsControl.hpp"
 
 struct Interface {
+    Interface() {};
+
     void start();
-    void addHardware();
+    void addMachine();
     void menu();
 
-    OperatingSystem OS;
     EventsControl events;
 };
