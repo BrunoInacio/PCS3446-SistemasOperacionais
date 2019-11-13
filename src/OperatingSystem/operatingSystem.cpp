@@ -31,31 +31,11 @@ PredictedEvent OperatingSystem::addJob(Job &&j) {
 
 
 /**
- * Tenta alocar um job para a memória principal do sistema.
- */
-PredictedEvent OperatingSystem::memAlloc(int jobID) {
-    auto job = this->jobs.at(jobID);
-
-    try {
-        this->memory->allocate(jobID, job->memoryUsed);
-        return { jobID, 0, Event::CPU_RUN };
-    }
-    catch (Error) {
-        this->waitMemory(jobID);
-    }
-
-    return { jobID, 0, Event::NONE };
-}
-
-
-/**
  * Tenta iniciar o processamento de um job.
  */
 PredictedEvent OperatingSystem::process(int jobID) {
-    auto job = this->jobs.at(jobID);
-
     try {
-        return this->processor->run(job, 1);
+        return this->processor->run(this->jobs.at(jobID), this->time);
     }
     catch (Error) {
         this->waitProcessor(jobID);
@@ -64,19 +44,89 @@ PredictedEvent OperatingSystem::process(int jobID) {
     return { jobID, 0, Event::NONE };
 }
 
+/**
+ * Tenta alocar um job para a memória principal do sistema.
+ */
+PredictedEvent OperatingSystem::memAlloc(int jobID) {
+    try {
+        this->memory->allocate(jobID, this->jobs.at(jobID)->memoryUsed);
+        return { jobID, 0, Event::CPU_RUN };
+    }
+    catch (Error) {
+        this->waitMemory(jobID);
+    }
 
+    return { 0, 0, Event::NONE };
+}
+
+
+/**
+ * Executa o próximo job na fila do processador.
+ */
+PredictedEvent OperatingSystem::nextToProcessor() {
+    if (this->jobToProcess.empty())
+        return { 0, 0, Event::NONE };
+
+    try {
+        auto jobID = this->jobToProcess.front();
+        PredictedEvent e = this->processor->run(this->jobs.at(jobID), this->time);
+        this->jobToProcess.pop_front();
+        return e;
+    }
+    catch (Error) {
+        return { 0, 0, Event::NONE };
+    }
+}
+
+
+/**
+ * Aloca o próximo job na fila da memória.
+ */
+PredictedEvent OperatingSystem::nextToMemory() {
+    if (this->jobToMemory.empty())
+        return { 0, 0, Event::NONE };
+
+    try {
+        auto jobID = this->jobToMemory.front();
+        this->memory->allocate(jobID, this->jobs.at(jobID)->memoryUsed);
+        this->jobToMemory.pop_front();
+        return { jobID, 0, Event::CPU_RUN };
+    }
+    catch (Error) {
+        return { 0, 0, Event::NONE };
+    }
+}
+
+
+PredictedEvent OperatingSystem::nextToDisk() {
+    if (this->jobToDisk.empty())
+        return { 0, 0, Event::NONE };
+
+    return { 0, 0, Event::NONE };
+}
+
+
+/**
+ * Adiciona um job par a fila da memória.
+ */
 void OperatingSystem::waitMemory(int jobID) {
-
+    this->jobToMemory.push_back(jobID);
 }
 
 
+/**
+ * Adiciona um job par a fila do processador.
+ */
 void OperatingSystem::waitProcessor(int jobID) {
-
+    this->jobToProcess.push_back(jobID);
 }
 
 
+/**
+ * Adiciona um job par a fila do disco.
+ */
 void OperatingSystem::waitDisk(int jobID) {
-
+    this->jobToDisk.push_back(jobID);
 }
 
 

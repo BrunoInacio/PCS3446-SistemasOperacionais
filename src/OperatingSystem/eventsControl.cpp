@@ -17,13 +17,14 @@
  * Roda a máquina por um determinado intervalo de tempo 'time'.
  */
 void EventsControl::run(int duration) {
-    this->addEvent({ 0, this->time + duration, Event::SYS_PAUSE });
+    this->addEvent({ 0, duration, Event::SYS_PAUSE });
 
     try {
         while (!this->events.empty()) {
             auto e = this->events.front();
             this->events.pop_front();
             this->time = e.time;
+            this->OS->time = this->time;
 
             auto newEvent = (this->*EventsControl::actions.at(e.event))(e);
             this->addEvent(newEvent);
@@ -62,13 +63,6 @@ PredictedEvent EventsControl::jobArrive(PredictedEvent e) {
 }
 
 
-PredictedEvent EventsControl::jobDone(PredictedEvent e) {
-    std::cout << "jobDone" << std::endl;
-
-    return { 0, 0, Event::NONE };
-}
-
-
 /**
  * Envia pedido para o SO para alocação de um job na memória.
  */
@@ -78,8 +72,19 @@ PredictedEvent EventsControl::memAlloc(PredictedEvent e) {
 }
 
 
+/**
+ * Libera a memória usada pelo job e envia pedido para o SO
+ * rodar a lista de espera pela memória.
+ */
 PredictedEvent EventsControl::memFree(PredictedEvent e) {
-    return { 0, 0, Event::NONE };
+    this->OS->memory->free(e.jobID);
+
+    auto chainEvent = this->OS->nextToMemory();
+
+    if (chainEvent.event != Event::NONE)
+        this->OS->jobs.at(chainEvent.jobID)->state = State::READY;
+
+    return chainEvent;
 }
 
 
@@ -111,6 +116,7 @@ PredictedEvent EventsControl::CPURun(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
     auto newEvent = this->OS->process(e.jobID);
+
     if (newEvent.event != Event::NONE)
         this->OS->jobs.at(newEvent.jobID)->state = State::RUNNING;
 
@@ -118,17 +124,37 @@ PredictedEvent EventsControl::CPURun(PredictedEvent e) {
 }
 
 
+/**
+ * Interrompe o uso da CPU e envia um novo processo para ela.
+ */
 PredictedEvent EventsControl::CPURelease(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
-    return { 0, 0, Event::NONE };
+    auto newEvent = this->OS->processor->release(this->time);
+
+    if (auto chainEvent = this->OS->nextToProcessor(); chainEvent.event != Event::NONE) {
+        this->OS->jobs.at(chainEvent.jobID)->state = State::RUNNING;
+        this->addEvent(chainEvent);
+    }
+
+    return newEvent;
 }
 
 
+/**
+ * Finaliza o uso da CPU e envia um novo processo para ela.
+ */
 PredictedEvent EventsControl::CPUDone(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::DONE;
 
-    return { 0, 0, Event::NONE };
+    auto newEvent = this->OS->processor->release(this->time);
+
+    if (auto chainEvent = this->OS->nextToProcessor(); chainEvent.event != Event::NONE) {
+        this->OS->jobs.at(chainEvent.jobID)->state = State::RUNNING;
+        this->addEvent(chainEvent);
+    }
+
+    return newEvent;
 }
 
 

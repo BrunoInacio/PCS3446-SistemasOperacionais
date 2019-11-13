@@ -27,7 +27,6 @@ enum class Event : int {
 
     // Job
     JOB_ARRIVE,
-    JOB_DONE,
 
     // System
     SYS_PAUSE,
@@ -97,7 +96,6 @@ inline const std::unordered_map<Event, std::string> Translate::event = {
     { Event::CPU_DONE,          "CPU_DONE"          },
 
     { Event::JOB_ARRIVE,        "JOB_ARRIVE"        },
-    { Event::JOB_DONE,          "JOB_DONE"          },
 
     { Event::SYS_PAUSE,         "SYS_PAUSE"         },
 };

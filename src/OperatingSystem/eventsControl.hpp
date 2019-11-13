@@ -44,7 +44,6 @@ private:
     PredictedEvent CPUDone(PredictedEvent e);
 
     PredictedEvent jobArrive(PredictedEvent e);
-    PredictedEvent jobDone(PredictedEvent e);
 
     PredictedEvent sysPause(PredictedEvent e);
 
@@ -65,7 +64,6 @@ inline const std::unordered_map<Event, PredictedEvent(EventsControl::*)(Predicte
     { Event::CPU_DONE,          &EventsControl::CPUDone         },
 
     { Event::JOB_ARRIVE,        &EventsControl::jobArrive       },
-    { Event::JOB_DONE,          &EventsControl::jobDone         },
 
     { Event::SYS_PAUSE,         &EventsControl::sysPause        },
 };

@@ -36,9 +36,17 @@ public:
 
     std::unordered_map<int, std::shared_ptr<Job>> jobs;
 
-private:
+    std::unique_ptr<Processor> processor;
+    std::unique_ptr<Memory> memory;
+    std::unique_ptr<Disk> disk;
+
+    PredictedEvent nextToProcessor();
+    PredictedEvent nextToMemory();
+    PredictedEvent nextToDisk();
+
     int time;
 
+private:
     void waitProcessor(int jobID);
     void waitMemory(int jobID);
     void waitDisk(int jobID);
@@ -46,8 +54,4 @@ private:
     std::deque<int> jobToProcess;
     std::deque<int> jobToMemory;
     std::deque<int> jobToDisk;
-
-    std::unique_ptr<Processor> processor;
-    std::unique_ptr<Memory> memory;
-    std::unique_ptr<Disk> disk;
 };
