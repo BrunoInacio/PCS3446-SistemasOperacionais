@@ -25,7 +25,8 @@ void EventsControl::run(int duration) {
             this->events.pop_front();
             this->time = e.time;
 
-            (this->*EventsControl::actions.at(e.event))(e);
+            auto newEvent = (this->*EventsControl::actions.at(e.event))(e);
+            this->addEvent(newEvent);
         }
     }
     catch (std::string err) {
@@ -38,6 +39,11 @@ void EventsControl::run(int duration) {
  * Adiciona 'event' à máquina.
  */
 void EventsControl::addEvent(PredictedEvent event) {
+    if (event.event == Event::NONE)
+        return;
+
+    event.time += this->time;
+
     auto position = std::lower_bound(this->events.begin(), this->events.end(), event);
     this->events.insert(position, event);
 }
@@ -51,60 +57,85 @@ void EventsControl::addOS(OperatingSystem&& OS) {
 }
 
 
-void EventsControl::jobArrive(PredictedEvent e) {
-    this->OS->addJob(Job(100, 100, Priority::NORMAL));
+PredictedEvent EventsControl::jobArrive(PredictedEvent e) {
+    return this->OS->addJob(Job(100, 100, Priority::NORMAL));
 }
 
 
-void EventsControl::jobDone(PredictedEvent e) {
+PredictedEvent EventsControl::jobDone(PredictedEvent e) {
     std::cout << "jobDone" << std::endl;
+
+    return { 0, 0, Event::NONE };
 }
 
 
-void EventsControl::memAlloc(PredictedEvent e) {
-    std::cout << "memAlloc" << std::endl;
+/**
+ * Envia pedido para o SO para alocação de um job na memória.
+ */
+PredictedEvent EventsControl::memAlloc(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::WAITING_RESOURCES;
+    return this->OS->memAlloc(e.jobID);
 }
 
 
-void EventsControl::memFree(PredictedEvent e) {
-    std::cout << "memFree" << std::endl;
+PredictedEvent EventsControl::memFree(PredictedEvent e) {
+    return { 0, 0, Event::NONE };
 }
 
 
-void EventsControl::IOStartRead(PredictedEvent e) {
-    std::cout << "IOStartRead" << std::endl;
+PredictedEvent EventsControl::IOStartRead(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
+
+    return { 0, 0, Event::NONE };
 }
 
 
-void EventsControl::IOStartWrite(PredictedEvent e) {
-    std::cout << "IOStartWrite" << std::endl;
+PredictedEvent EventsControl::IOStartWrite(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
+
+    return { 0, 0, Event::NONE };
 }
 
 
-void EventsControl::IOComplete(PredictedEvent e) {
-    std::cout << "IOComplete" << std::endl;
+PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::READY;
+
+    return {0, 0, Event::NONE };
 }
 
 
-void EventsControl::CPURun(PredictedEvent e) {
-    std::cout << "CPURun" << std::endl;
+/**
+ * Envia pedido para o SO para executar um job no processador.
+ */
+PredictedEvent EventsControl::CPURun(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::READY;
+
+    auto newEvent = this->OS->process(e.jobID);
+    if (newEvent.event != Event::NONE)
+        this->OS->jobs.at(newEvent.jobID)->state = State::RUNNING;
+
+    return newEvent;
 }
 
 
-void EventsControl::CPURelease(PredictedEvent e) {
-    std::cout << "CPURelease" << std::endl;
+PredictedEvent EventsControl::CPURelease(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::READY;
+
+    return { 0, 0, Event::NONE };
 }
 
 
-void EventsControl::CPUDone(PredictedEvent e) {
-    std::cout << "CPUDone" << std::endl;
+PredictedEvent EventsControl::CPUDone(PredictedEvent e) {
+    this->OS->jobs.at(e.jobID)->state = State::DONE;
+
+    return { 0, 0, Event::NONE };
 }
 
 
 /**
  * Pausa a máquina de estados e retorna o controle para o usuário.
  */
-void EventsControl::sysPause(PredictedEvent e) {
+PredictedEvent EventsControl::sysPause(PredictedEvent e) {
     throw "[" + Translate::event.at(e.event) +"] Sistema pausado no instante " +
           std::to_string(e.time) + "ms.\n";
 }

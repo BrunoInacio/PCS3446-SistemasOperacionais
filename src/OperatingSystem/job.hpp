@@ -20,7 +20,7 @@ public:
 
     const int id;
     const int totalTime;
-    const double memoryUsed;
+    const int memoryUsed;
     const Priority priority;
 
     State state;

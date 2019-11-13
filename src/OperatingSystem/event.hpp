@@ -8,7 +8,9 @@
 
 #include <unordered_map>
 
-enum class Event {
+enum class Event : int {
+    NONE = 0,
+
     // Memória
     MEM_ALLOC,
     MEM_FREE,

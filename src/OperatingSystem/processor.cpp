@@ -13,7 +13,7 @@
  * Inicia a execução de um 'job' e informa a próxima operação.
  * Retorna uma tupla referente ao próximo evento.
  */
-PredictedEvent Processor::run(Job *job, int time) {
+PredictedEvent Processor::run(std::shared_ptr<Job> job, int time) {
     if (this->isRunning)
         throw Error::CPU_UNAVAILABLE;
     

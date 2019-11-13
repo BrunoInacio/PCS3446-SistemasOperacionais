@@ -22,6 +22,65 @@ OperatingSystem::OperatingSystem()
 
 
 /**
+ * Adiciona job ao sistema operacional.
+ */
+PredictedEvent OperatingSystem::addJob(Job &&j) {
+    this->jobs[j.id] = std::make_shared<Job>(j);
+    return { j.id, 0, Event::MEM_ALLOC };
+}
+
+
+/**
+ * Tenta alocar um job para a memória principal do sistema.
+ */
+PredictedEvent OperatingSystem::memAlloc(int jobID) {
+    auto job = this->jobs.at(jobID);
+
+    try {
+        this->memory->allocate(jobID, job->memoryUsed);
+        return { jobID, 0, Event::CPU_RUN };
+    }
+    catch (Error) {
+        this->waitMemory(jobID);
+    }
+
+    return { jobID, 0, Event::NONE };
+}
+
+
+/**
+ * Tenta iniciar o processamento de um job.
+ */
+PredictedEvent OperatingSystem::process(int jobID) {
+    auto job = this->jobs.at(jobID);
+
+    try {
+        return this->processor->run(job, 1);
+    }
+    catch (Error) {
+        this->waitProcessor(jobID);
+    }
+
+    return { jobID, 0, Event::NONE };
+}
+
+
+void OperatingSystem::waitMemory(int jobID) {
+
+}
+
+
+void OperatingSystem::waitProcessor(int jobID) {
+
+}
+
+
+void OperatingSystem::waitDisk(int jobID) {
+
+}
+
+
+/**
  * Adiciona o processador que será utilizado pelo sistema.
  */
 void OperatingSystem::addProcessor(Processor&& p) {
@@ -42,14 +101,6 @@ void OperatingSystem::addMemory(Memory&& m) {
  */
 void OperatingSystem::addDisk(Disk&& d) {
     this->disk = std::make_unique<Disk>(d);
-}
-
-
-/**
- * Adiciona job ao sistema operacional.
- */
-void OperatingSystem::addJob(Job &&j) {
-    this->jobs[j.id] = std::make_unique<Job>(j);
 }
 
 

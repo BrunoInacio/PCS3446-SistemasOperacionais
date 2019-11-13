@@ -36,7 +36,7 @@ void Interface::addMachine() {
 
     this->events.OS->addProcessor(Processor());
     this->events.OS->addMemory(Memory(2000));
-    this->events.OS->addDisk(Disk(100E3, 80E3, 80E3, 15));
+    this->events.OS->addDisk(Disk(100E3, 80.0, 80.0, 15.0));
 }
 
 
@@ -45,16 +45,16 @@ void Interface::addMachine() {
  */
 void Interface::menu() {
     int menu;
-    enum options { EXIT, ADD, RUN, EVENTS, JOBS, HARD };
+    enum options { EXIT, ADD, EVENTS, JOBS, HARD, RUN };
 
     while (true) {
         std::cout << std::endl;
         std::cout << EXIT << ". Sair" << std::endl;
         std::cout << ADD << ". Adicionar jobs ao SO." << std::endl;
-        std::cout << RUN << ". Rodar simulacao." << std::endl;
         std::cout << EVENTS << ". Visualizar informacoes sobre futuros eventos." << std::endl;
         std::cout << JOBS << ". Visualizar informacoes sobre todos os jobs." << std::endl;
         std::cout << HARD << ". Visualizar informacoes sobre o uso do sistema." << std::endl;
+        std::cout << RUN << ". Rodar simulacao." << std::endl;
         std::cout << "\nDigite o numero da opcao desejada: ";
 
         switch (std::cin >> menu; menu) {
@@ -65,7 +65,7 @@ void Interface::menu() {
             std::cout << "Quantos jobs deseja adicionar ao SO?" << std::endl;
             std::cin >> numJobs;
 
-            std::cout << "Qual o tempo maximo ate a chegada do ultimo job?" << std::endl;
+            std::cout << "Qual o tempo maximo ate a chegada do ultimo job? (em ms)" << std::endl;
             std::cin >> maxTime;
 
             std::random_device rd;
@@ -80,7 +80,7 @@ void Interface::menu() {
 
         case RUN:
             int time;
-            std::cout << "Por quanto tempo deseja executar o sistema operacional?" << std::endl;
+            std::cout << "Por quanto tempo deseja executar o sistema operacional? (em ms)" << std::endl;
             std::cin >> time;
 
             this->events.run(time);

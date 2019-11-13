@@ -12,13 +12,13 @@
 
 Disk::Disk(double size, double readSpeed, double writeSpeed, double responseTime)
     : size(size),
-      readSpeed(readSpeed / 1000.),
-      writeSpeed(writeSpeed / 1000.),
+      readSpeed(readSpeed),
+      writeSpeed(writeSpeed),
       responseTime(responseTime),
       isRunning(0),
       jobID(0),
-      totalRead(0),
-      totalWrite(0) {
+      totalRead(0.0),
+      totalWrite(0.0) {
 }
 
 /**
@@ -73,7 +73,7 @@ PredictedEvent Disk::completeIO() {
  * Calcula o tempo de leitura de um arquivo de tamanho 'size'.
  */
 int Disk::readTime(double size) const {
-    return static_cast<int>(this->responseTime + size / this->readSpeed);
+    return static_cast<int>(this->responseTime + 1000. * size / this->readSpeed);
 }
 
 
@@ -81,7 +81,7 @@ int Disk::readTime(double size) const {
  * Calcula o tempo de escrita de um arquivo de tamanho 'size'.
  */
 int Disk::writeTime(double size) const {
-    return static_cast<int>(this->responseTime + size / this->writeSpeed);
+    return static_cast<int>(this->responseTime + 1000. * size / this->writeSpeed);
 }
 
 
@@ -90,11 +90,11 @@ int Disk::writeTime(double size) const {
  */
 void Disk::info() {
     std::cout << "=== Disco ===" << std::endl;
-    std::cout << "Tamanho total: " << this->size << "MB" << std::endl;
-    std::cout << "Velocidade de leitura: " << this->readSpeed << "MB/s" << std::endl;
-    std::cout << "Velocidade de escrita: " << this->writeSpeed << "MB/s" << std::endl;
-    std::cout << "Total de leituras feitas: " << this->totalRead << "MB" << std::endl;
-    std::cout << "Total de escritas feitas: " << this->totalWrite << "MB" << std::endl;
+    std::cout << "Tamanho total: " << this->size << " MB" << std::endl;
+    std::cout << "Velocidade de leitura: " << std::setprecision(2) << this->readSpeed << " MB/s" << std::endl;
+    std::cout << "Velocidade de escrita: " << std::setprecision(2) << this->writeSpeed << " MB/s" << std::endl;
+    std::cout << "Total de leituras feitas: " << std::setprecision(2) << this->totalRead << " MB" << std::endl;
+    std::cout << "Total de escritas feitas: " << std::setprecision(2) << this->totalWrite << " MB" << std::endl;
 
     std::cout << std::endl;
 }

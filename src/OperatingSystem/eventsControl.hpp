@@ -32,27 +32,27 @@ private:
 
     std::deque<PredictedEvent> events;
 
-    void memAlloc(PredictedEvent e);
-    void memFree(PredictedEvent e);
+    PredictedEvent memAlloc(PredictedEvent e);
+    PredictedEvent memFree(PredictedEvent e);
 
-    void IOStartRead(PredictedEvent e);
-    void IOStartWrite(PredictedEvent e);
-    void IOComplete(PredictedEvent e);
+    PredictedEvent IOStartRead(PredictedEvent e);
+    PredictedEvent IOStartWrite(PredictedEvent e);
+    PredictedEvent IOComplete(PredictedEvent e);
 
-    void CPURun(PredictedEvent e);
-    void CPURelease(PredictedEvent e);
-    void CPUDone(PredictedEvent e);
+    PredictedEvent CPURun(PredictedEvent e);
+    PredictedEvent CPURelease(PredictedEvent e);
+    PredictedEvent CPUDone(PredictedEvent e);
 
-    void jobArrive(PredictedEvent e);
-    void jobDone(PredictedEvent e);
+    PredictedEvent jobArrive(PredictedEvent e);
+    PredictedEvent jobDone(PredictedEvent e);
 
-    void sysPause(PredictedEvent e);
+    PredictedEvent sysPause(PredictedEvent e);
 
-    static const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> actions;
+    static const std::unordered_map<Event, PredictedEvent(EventsControl::*)(PredictedEvent)> actions;
 };
 
 
-inline const std::unordered_map<Event, void (EventsControl::*)(PredictedEvent)> EventsControl::actions = {
+inline const std::unordered_map<Event, PredictedEvent(EventsControl::*)(PredictedEvent)> EventsControl::actions = {
     { Event::MEM_ALLOC,         &EventsControl::memAlloc        },
     { Event::MEM_FREE,          &EventsControl::memFree         },
 
