@@ -62,8 +62,5 @@
     <ClInclude Include="..\src\OperatingSystem\eventsControl.hpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\OperatingSystem\stochasticJobs.hpp">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

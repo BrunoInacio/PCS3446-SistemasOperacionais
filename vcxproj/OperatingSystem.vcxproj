@@ -36,7 +36,6 @@
     <ClInclude Include="..\src\OperatingSystem\memory.hpp" />
     <ClInclude Include="..\src\OperatingSystem\operatingSystem.hpp" />
     <ClInclude Include="..\src\OperatingSystem\processor.hpp" />
-    <ClInclude Include="..\src\OperatingSystem\stochasticJobs.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

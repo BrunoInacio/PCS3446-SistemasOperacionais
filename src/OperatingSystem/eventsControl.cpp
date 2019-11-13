@@ -62,7 +62,13 @@ void EventsControl::addOS(OperatingSystem&& OS) {
  * Adiciona um job ao SO.
  */
 PredictedEvent EventsControl::jobArrive(PredictedEvent e) {
-    return this->OS->addJob(this->OS->stochasticJob());
+    auto nextEvent = this->OS->addJob(this->OS->stochasticJob());
+
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << nextEvent.jobID << " foi adicionado ao sistema."
+        << std::endl;
+
+    return nextEvent;
 }
 
 
@@ -95,6 +101,10 @@ PredictedEvent EventsControl::memFree(PredictedEvent e) {
  * Solicita o início de uma operação de Entrada.
  */
 PredictedEvent EventsControl::IOStartRead(PredictedEvent e) {
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << e.jobID << " requisitou acesso de leitura do disco."
+        << std::endl;
+
     this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
     return this->OS->IO(e.jobID, Disk::IO::READ, e.size);
 }
@@ -104,6 +114,10 @@ PredictedEvent EventsControl::IOStartRead(PredictedEvent e) {
  * Solicita o início de uma operação de Saída.
  */
 PredictedEvent EventsControl::IOStartWrite(PredictedEvent e) {
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << e.jobID << " requisitou acesso de escrita no disco."
+        << std::endl;
+
     this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
     return this->OS->IO(e.jobID, Disk::IO::WRITE, e.size);
 }
@@ -114,6 +128,10 @@ PredictedEvent EventsControl::IOStartWrite(PredictedEvent e) {
  * a lista de espera pelo disco.
  */
 PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << e.jobID << " finalizou acesso ao disco."
+        << std::endl;
+
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
     auto newEvent = this->OS->disk->completeIO();
@@ -131,6 +149,10 @@ PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
  * Envia pedido para o SO para executar um job no processador.
  */
 PredictedEvent EventsControl::CPURun(PredictedEvent e) {
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << e.jobID << " requisitou processamento."
+        << std::endl;
+
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
     auto newEvent = this->OS->process(e.jobID);
@@ -163,6 +185,10 @@ PredictedEvent EventsControl::CPURelease(PredictedEvent e) {
  * Finaliza o uso da CPU e envia um novo processo para ela.
  */
 PredictedEvent EventsControl::CPUDone(PredictedEvent e) {
+    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
+        << ": O job " << e.jobID << " foi finalizado."
+        << std::endl;
+
     this->OS->jobs.at(e.jobID)->state = State::DONE;
 
     auto newEvent = this->OS->processor->release(this->time);
