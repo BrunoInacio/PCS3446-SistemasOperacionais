@@ -149,10 +149,6 @@ PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
  * Envia pedido para o SO para executar um job no processador.
  */
 PredictedEvent EventsControl::CPURun(PredictedEvent e) {
-    std::cout << "[" << Translate::event.at(e.event) << "] " << this->time
-        << ": O job " << e.jobID << " requisitou processamento."
-        << std::endl;
-
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
     auto newEvent = this->OS->process(e.jobID);

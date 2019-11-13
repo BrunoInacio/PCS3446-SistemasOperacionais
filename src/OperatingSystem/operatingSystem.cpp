@@ -225,12 +225,36 @@ void OperatingSystem::infoHardware() {
  * estatística usual dos jobs.
  */
  Job OperatingSystem::stochasticJob() {
-     std::random_device r;
+     int memSizeTable[] = { 15, 75, 200, 400, 500 };
+     int totalTimeTable[] = { 15, 50, 100, 250, 1000 };
+     int fileSizeTable[] = { 1, 5, 20, 200, 1000 };
 
-     auto j = Job(10, 20, Priority::NORMAL);
+     std::random_device rd;
+     std::mt19937 gen(rd());
+     std::uniform_real_distribution<> dis(0.0, 1.0);
 
-     j.addOperation(std::make_tuple(5, Job::Operation::IO_READ, 35.0));
-     j.addOperation(std::make_tuple(9, Job::Operation::IO_READ, 35.0));
+     auto memPos = dis(gen);
+     int memSize = memSizeTable[(memPos > .9) + (memPos > .7) + (memPos > .3) + (memPos > .1)];
+
+     auto timePos = dis(gen);
+     int totalTime = totalTimeTable[(timePos > .9) + (timePos > .7) + (timePos > .3) + (timePos > .1)];
+
+     auto priorityPos = dis(gen);
+     Priority priority = static_cast<Priority>((timePos > .9) + (timePos > .7) + (timePos > .3));
+
+     auto j = Job(totalTime, memSize, priority);
+
+     auto disIO = dis(gen);
+     auto numIO = (disIO > .9) + (disIO > .7) + 2*(disIO > .3) + 2*(disIO > .1);
+
+     for (auto i = 1; i <= numIO; i++) {
+         Job::Operation op = dis(gen) > .66 ? Job::Operation::IO_WRITE : Job::Operation::IO_READ;
+
+         auto filePos = dis(gen);
+         int fileSize = fileSizeTable[(timePos > .9) + (timePos > .7) + (timePos > .3) + (timePos > .1)];
+
+         j.addOperation(std::make_tuple(i * (totalTime - 1) / numIO, op, fileSize));
+     }
 
      return j;
  }
