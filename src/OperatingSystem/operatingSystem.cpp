@@ -59,6 +59,20 @@ PredictedEvent OperatingSystem::memAlloc(int jobID) {
     return { 0, 0, Event::NONE };
 }
 
+/**
+ * Tenta realizar uma operação de IO.
+ */
+PredictedEvent OperatingSystem::IO(int jobID, Disk::IO op, double size) {
+    try {
+        return this->disk->processIO(jobID, op, size);
+    }
+    catch (Error) {
+        this->waitDisk(jobID, op, size);
+    }
+
+    return { 0, 0, Event::NONE };
+}
+
 
 /**
  * Executa o próximo job na fila do processador.
@@ -98,11 +112,22 @@ PredictedEvent OperatingSystem::nextToMemory() {
 }
 
 
+/**
+ * Aloca o próximo job na fila do disco.
+ */
 PredictedEvent OperatingSystem::nextToDisk() {
     if (this->jobToDisk.empty())
         return { 0, 0, Event::NONE };
 
-    return { 0, 0, Event::NONE };
+    try {
+        auto [jobID, op, size] = this->jobToDisk.front();
+        auto e = this->disk->processIO(jobID, op, size);
+        this->jobToDisk.pop_front();
+        return e;
+    }
+    catch (Error) {
+        return { 0, 0, Event::NONE };
+    }
 }
 
 
@@ -125,8 +150,8 @@ void OperatingSystem::waitProcessor(int jobID) {
 /**
  * Adiciona um job par a fila do disco.
  */
-void OperatingSystem::waitDisk(int jobID) {
-    this->jobToDisk.push_back(jobID);
+void OperatingSystem::waitDisk(int jobID, Disk::IO op, double size) {
+    this->jobToDisk.push_back(std::make_tuple(jobID, op, size));
 }
 
 
@@ -185,14 +210,17 @@ void OperatingSystem::infoHardware() {
 
 
 
-/**
+/*
  * Define um job com valores estocásticos baseados em uma distribuição
  * estatística usual dos jobs.
  */
- /*std::tuple<int, Job> OperatingSystem::stochasticJob(int maxTime) {
+ Job OperatingSystem::stochasticJob() {
      std::random_device r;
 
-     int time = 0;
+     auto j = Job(10, 20, Priority::NORMAL);
 
-     return std::make_tuple(time, Job(10, 20, Priority::NORMAL));
- }*/
+     j.addOperation(std::make_tuple(5, Job::Operation::IO_READ, 35.0));
+     j.addOperation(std::make_tuple(9, Job::Operation::IO_READ, 35.0));
+
+     return j;
+ }

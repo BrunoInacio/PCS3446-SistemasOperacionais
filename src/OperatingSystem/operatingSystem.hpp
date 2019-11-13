@@ -12,6 +12,7 @@
 #include "memory.hpp"
 #include "disk.hpp"
 
+#include <tuple>
 #include <memory>
 #include <deque>
 #include <unordered_map>
@@ -30,9 +31,11 @@ public:
     void infoHardware();
 
     PredictedEvent addJob(Job &&j);
+    Job stochasticJob();
 
     PredictedEvent memAlloc(int jobID);
     PredictedEvent process(int jobID);
+    PredictedEvent IO(int jobID, Disk::IO op, double size);
 
     std::unordered_map<int, std::shared_ptr<Job>> jobs;
 
@@ -49,9 +52,9 @@ public:
 private:
     void waitProcessor(int jobID);
     void waitMemory(int jobID);
-    void waitDisk(int jobID);
+    void waitDisk(int jobID, Disk::IO op, double size);
 
     std::deque<int> jobToProcess;
     std::deque<int> jobToMemory;
-    std::deque<int> jobToDisk;
+    std::deque<std::tuple<int, Disk::IO, double>> jobToDisk;
 };

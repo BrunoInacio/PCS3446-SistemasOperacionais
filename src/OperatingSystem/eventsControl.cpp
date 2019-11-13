@@ -58,8 +58,11 @@ void EventsControl::addOS(OperatingSystem&& OS) {
 }
 
 
+/**
+ * Adiciona um job ao SO.
+ */
 PredictedEvent EventsControl::jobArrive(PredictedEvent e) {
-    return this->OS->addJob(Job(100, 100, Priority::NORMAL));
+    return this->OS->addJob(this->OS->stochasticJob());
 }
 
 
@@ -88,24 +91,39 @@ PredictedEvent EventsControl::memFree(PredictedEvent e) {
 }
 
 
+/**
+ * Solicita o início de uma operação de Entrada.
+ */
 PredictedEvent EventsControl::IOStartRead(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
-
-    return { 0, 0, Event::NONE };
+    return this->OS->IO(e.jobID, Disk::IO::READ, e.size);
 }
 
 
+/**
+ * Solicita o início de uma operação de Saída.
+ */
 PredictedEvent EventsControl::IOStartWrite(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::WAITING_IO;
-
-    return { 0, 0, Event::NONE };
+    return this->OS->IO(e.jobID, Disk::IO::WRITE, e.size);
 }
 
 
+/**
+ * Libera o disco para ser usado e envia comando para o SO rodar
+ * a lista de espera pelo disco.
+ */
 PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
-    return {0, 0, Event::NONE };
+    auto newEvent = this->OS->disk->completeIO();
+
+    if (auto chainEvent = this->OS->nextToDisk(); chainEvent.event != Event::NONE) {
+        this->OS->jobs.at(chainEvent.jobID)->state = State::WAITING_IO;
+        this->addEvent(chainEvent);
+    }
+
+    return newEvent;
 }
 
 
