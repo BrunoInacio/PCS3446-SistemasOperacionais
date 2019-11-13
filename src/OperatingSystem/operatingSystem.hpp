@@ -54,7 +54,7 @@ private:
     void waitMemory(int jobID);
     void waitDisk(int jobID, Disk::IO op, double size);
 
-    std::deque<int> jobToProcess;
-    std::deque<int> jobToMemory;
-    std::deque<std::tuple<int, Disk::IO, double>> jobToDisk;
+    std::deque<std::pair<int, int>> jobToProcess;
+    std::deque<std::pair<int, int>> jobToMemory;
+    std::deque< std::pair<int, std::tuple<int, Disk::IO, double>>> jobToDisk;
 };

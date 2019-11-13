@@ -9,6 +9,8 @@
 #include <algorithm>
 
 #include <random>
+#include <algorithm>
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -82,7 +84,7 @@ PredictedEvent OperatingSystem::nextToProcessor() {
         return { 0, 0, Event::NONE };
 
     try {
-        auto jobID = this->jobToProcess.front();
+        auto [_, jobID] = this->jobToProcess.front();
         PredictedEvent e = this->processor->run(this->jobs.at(jobID), this->time);
         this->jobToProcess.pop_front();
         return e;
@@ -101,7 +103,7 @@ PredictedEvent OperatingSystem::nextToMemory() {
         return { 0, 0, Event::NONE };
 
     try {
-        auto jobID = this->jobToMemory.front();
+        auto [_, jobID] = this->jobToMemory.front();
         this->memory->allocate(jobID, this->jobs.at(jobID)->memoryUsed);
         this->jobToMemory.pop_front();
         return { jobID, 0, Event::CPU_RUN };
@@ -120,7 +122,8 @@ PredictedEvent OperatingSystem::nextToDisk() {
         return { 0, 0, Event::NONE };
 
     try {
-        auto [jobID, op, size] = this->jobToDisk.front();
+        auto [_, waitJob] = this->jobToDisk.front();
+        auto [jobID, op, size] = waitJob;
         auto e = this->disk->processIO(jobID, op, size);
         this->jobToDisk.pop_front();
         return e;
@@ -135,7 +138,10 @@ PredictedEvent OperatingSystem::nextToDisk() {
  * Adiciona um job par a fila da memória.
  */
 void OperatingSystem::waitMemory(int jobID) {
-    this->jobToMemory.push_back(jobID);
+    auto waitJob = std::make_pair(static_cast<int>(this->jobs.at(jobID)->priority), jobID);
+
+    auto position = std::lower_bound(this->jobToMemory.begin(), this->jobToMemory.end(), waitJob);
+    this->jobToMemory.insert(position, waitJob);
 }
 
 
@@ -143,7 +149,10 @@ void OperatingSystem::waitMemory(int jobID) {
  * Adiciona um job par a fila do processador.
  */
 void OperatingSystem::waitProcessor(int jobID) {
-    this->jobToProcess.push_back(jobID);
+    auto waitJob = std::make_pair(static_cast<int>(this->jobs.at(jobID)->priority), jobID);
+
+    auto position = std::lower_bound(this->jobToProcess.begin(), this->jobToProcess.end(), waitJob);
+    this->jobToProcess.insert(position, waitJob);
 }
 
 
@@ -151,7 +160,10 @@ void OperatingSystem::waitProcessor(int jobID) {
  * Adiciona um job par a fila do disco.
  */
 void OperatingSystem::waitDisk(int jobID, Disk::IO op, double size) {
-    this->jobToDisk.push_back(std::make_tuple(jobID, op, size));
+    auto waitJob = std::make_pair(static_cast<int>(this->jobs.at(jobID)->priority), std::make_tuple(jobID, op, size));
+
+    auto position = std::lower_bound(this->jobToDisk.begin(), this->jobToDisk.end(), waitJob);
+    this->jobToDisk.insert(position, waitJob);
 }
 
 
@@ -206,8 +218,6 @@ void OperatingSystem::infoHardware() {
     this->memory->info();
     this->disk->info();
 }
-
-
 
 
 /*
