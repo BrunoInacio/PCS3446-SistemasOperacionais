@@ -8,40 +8,62 @@
 
 #include "event.hpp"
 
-#include <tuple>
 #include <vector>
 
 class Job {
 public:
-    enum class Operation;
+    struct Operation;
+    enum class Priority;
+    enum class OperationType;
+    enum class State;
 
-    Job(int totalTime, int memoryUsed, Priority priority);
+    Job(int totalProcessTime, int memoryUsed, Priority priority);
     ~Job() {};
 
     const int id;
-    const int totalTime;
+    const int totalProcessTime;
     const int memoryUsed;
-    const Priority priority;
 
+    const Priority priority;
     State state;
 
-    void addOperation(std::tuple<int, Job::Operation, double>);
     void process(int duration);
-
-    std::tuple<int, Job::Operation, double> getNextOperation();
+    void addOperation(Operation operation);
+    Operation getNextOperation();
 
 private:
     int processedTime;
-    std::vector<std::tuple<int, Job::Operation, double>> operations;
+    std::vector<Operation> operations;
 
     static int lastId;
 };
 
 inline int Job::lastId = 0;
 
-enum class Job::Operation {
+struct Job::Operation {
+    int instant;
+    OperationType operation;
+    double value;
+};
+
+enum class Job::OperationType {
     IO_READ,
     IO_WRITE,
     FINISH,
 };
 
+enum class Job::State {
+    SUBMIT,
+    WAITING_RESOURCES,
+    READY,
+    RUNNING,
+    WAITING_IO,
+    DONE,
+};
+
+enum class Job::Priority {
+    LOW,
+    NORMAL,
+    HIGH,
+    CRITICAL,
+};

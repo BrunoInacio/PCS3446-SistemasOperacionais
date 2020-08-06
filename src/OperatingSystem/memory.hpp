@@ -13,15 +13,20 @@ public:
     Memory(int totalSpace) : totalSpace(totalSpace), usedSpace(0) {};
     ~Memory() {};
 
+    enum class Result;
+
+    Result allocate(int jobID, int size);
+    Result free(int jobID);
+
     const int totalSpace;
-
-    void allocate(int jobID, int size);
-    void free(int jobID);
-
     void info();
-    std::unordered_map<int, int> getInfo() const;
 
 private:
     int usedSpace;
-    std::unordered_map<int, int> mem;
+    std::unordered_map<int, int> content;
+};
+
+enum class Memory::Result {
+    SUCCESS,
+    ERROR_MEMORY_FULL,
 };

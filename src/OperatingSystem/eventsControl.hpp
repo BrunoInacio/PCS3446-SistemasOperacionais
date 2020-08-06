@@ -34,36 +34,27 @@ private:
 
     PredictedEvent memAlloc(PredictedEvent e);
     PredictedEvent memFree(PredictedEvent e);
-
     PredictedEvent IOStartRead(PredictedEvent e);
     PredictedEvent IOStartWrite(PredictedEvent e);
     PredictedEvent IOComplete(PredictedEvent e);
-
     PredictedEvent CPURun(PredictedEvent e);
     PredictedEvent CPURelease(PredictedEvent e);
     PredictedEvent CPUDone(PredictedEvent e);
-
     PredictedEvent jobArrive(PredictedEvent e);
-
     PredictedEvent sysPause(PredictedEvent e);
 
     static const std::unordered_map<Event, PredictedEvent(EventsControl::*)(PredictedEvent)> actions;
 };
 
-
 inline const std::unordered_map<Event, PredictedEvent(EventsControl::*)(PredictedEvent)> EventsControl::actions = {
-    { Event::MEM_ALLOC,         &EventsControl::memAlloc        },
-    { Event::MEM_FREE,          &EventsControl::memFree         },
-
-    { Event::IO_START_READ,     &EventsControl::IOStartRead     },
-    { Event::IO_START_WRITE,    &EventsControl::IOStartWrite    },
-    { Event::IO_COMPLETE,       &EventsControl::IOComplete      },
-
-    { Event::CPU_RUN,           &EventsControl::CPURun          },
-    { Event::CPU_RELEASE,       &EventsControl::CPURelease      },
-    { Event::CPU_DONE,          &EventsControl::CPUDone         },
-
-    { Event::JOB_ARRIVE,        &EventsControl::jobArrive       },
-
-    { Event::SYS_PAUSE,         &EventsControl::sysPause        },
+    { Event::MEM_ALLOC,         &EventsControl::memAlloc     },
+    { Event::MEM_FREE,          &EventsControl::memFree      },
+    { Event::IO_START_READ,     &EventsControl::IOStartRead  },
+    { Event::IO_START_WRITE,    &EventsControl::IOStartWrite },
+    { Event::IO_COMPLETE,       &EventsControl::IOComplete   },
+    { Event::CPU_RUN,           &EventsControl::CPURun       },
+    { Event::CPU_RELEASE,       &EventsControl::CPURelease   },
+    { Event::CPU_DONE,          &EventsControl::CPUDone      },
+    { Event::JOB_ARRIVE,        &EventsControl::jobArrive    },
+    { Event::SYS_PAUSE,         &EventsControl::sysPause     },
 };

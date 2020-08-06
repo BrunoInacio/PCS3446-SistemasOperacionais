@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "event.hpp"
-
 #include <tuple>
 
 /**
@@ -18,36 +16,41 @@
  */
 class Disk {
 public:
-    Disk(double size, double readSpeed, double writeSpeed, double responseTime);
+    Disk(double totalSize, double readSpeed, double writeSpeed, double responseTime);
     ~Disk() {};
 
     enum class IO;
+    enum class Result;
 
-    const double size;
+    Result processIO(Disk::IO operation, double size);
+    Result completeIO();
 
-    PredictedEvent processIO(int id, Disk::IO operation, double size);
-    PredictedEvent completeIO();
-
+    int getIODuration() const;
+    const double totalSize;
     void info();
 
 private:
-
     bool isRunning;
-    int jobID;
+    IO currentOperation;
+    double fileSize;
 
-    double readSpeed;
-    double writeSpeed;
-
-    double responseTime;
+    const double responseTime;
+    const double readSpeed;
+    const double writeSpeed;
 
     double totalRead;
     double totalWrite;
-
-    int readTime(double size) const;
-    int writeTime(double size) const;
 };
 
 enum class Disk::IO {
+    NONE,
     READ,
     WRITE
+};
+
+enum class Disk::Result {
+    SUCCESS,
+    ERROR_DISK_UNAVAILABLE,
+    ERROR_NO_CURRENT_OPERATION,
+    ERROR_INVALID_OPERATION,
 };

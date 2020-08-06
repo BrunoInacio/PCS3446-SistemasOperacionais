@@ -10,91 +10,75 @@
 #include <iomanip>
 
 
-Disk::Disk(double size, double readSpeed, double writeSpeed, double responseTime)
-    : size(size),
-      readSpeed(readSpeed),
-      writeSpeed(writeSpeed),
-      responseTime(responseTime),
-      isRunning(0),
-      jobID(0),
-      totalRead(0.0),
-      totalWrite(0.0) {
-}
+Disk::Disk(double totalSize, double readSpeed, double writeSpeed, double responseTime)
+    : totalSize(totalSize),
+    readSpeed(readSpeed),
+    writeSpeed(writeSpeed),
+    responseTime(responseTime),
+    isRunning(false),
+    currentOperation(Disk::IO::NONE),
+    fileSize(0.0),
+    totalRead(0.0),
+    totalWrite(0.0) {}
 
 /**
  * Inicia o processamento de uma operação 'operation' de um arquivo
  * de tamanho 'size'. Enquanto a operação estiver em andamento, o disco 
  * é considerado ocupado e não pode fazer outra operação.
- * Retorna uma tupla referente ao próximo evento.
  */
-PredictedEvent Disk::processIO(int jobID, Disk::IO operation, double size) {
+Disk::Result Disk::processIO(Disk::IO operation, double fileSize) {
     if (this->isRunning)
-        throw Error::DISK_UNAVAILABLE;
-
-    PredictedEvent nextEvent;
+        return Disk::Result::ERROR_DISK_UNAVAILABLE;
 
     switch (operation) {
     case Disk::IO::READ:
-        this->totalRead += size;
-        nextEvent = { jobID, this->readTime(size), Event::IO_COMPLETE };
+        this->totalRead += fileSize;
         break;
 
     case Disk::IO::WRITE:
-        this->totalWrite += size;
-        nextEvent = { jobID, this->writeTime(size), Event::IO_COMPLETE };
+        this->totalWrite += fileSize;
         break;
 
     default:
-        throw "Operação inválida no disco.";
+        return Disk::Result::ERROR_INVALID_OPERATION;
     }
 
+    this->currentOperation = operation;
+    this->fileSize = fileSize;
     this->isRunning = true;
-    this->jobID = jobID;
-
-    return nextEvent;
+    return Disk::Result::SUCCESS;
 }
-
 
 /**
  * Finaliza a operação de IO, liberando o uso do disco.
- * Retorna o 'jobID' do job que estava realizando operação no disco.
  */
-PredictedEvent Disk::completeIO() {
+Disk::Result Disk::completeIO() {
+    if (!this->isRunning)
+        return Disk::Result::ERROR_NO_CURRENT_OPERATION;
+
     this->isRunning = false;
-
-    auto jobID = this->jobID;
-    this->jobID = 0;
-
-    return { jobID, 0, Event::CPU_RUN };
+    this->currentOperation = Disk::IO::NONE;
+    this->fileSize = 0.0;
+    return Disk::Result::SUCCESS;
 }
-
 
 /**
- * Calcula o tempo de leitura de um arquivo de tamanho 'size'.
+ * Calcula o tempo de uma operação de IO em um arquivo de tamanho 'size'.
  */
-int Disk::readTime(double size) const {
-    return static_cast<int>(this->responseTime + 1000. * size / this->readSpeed);
+int Disk::getIODuration() const {
+    auto speed = this->currentOperation == IO::READ ? this->readSpeed : this->writeSpeed;
+    return static_cast<int>(this->responseTime + 1000. * this->fileSize / speed);
 }
-
-
-/**
- * Calcula o tempo de escrita de um arquivo de tamanho 'size'.
- */
-int Disk::writeTime(double size) const {
-    return static_cast<int>(this->responseTime + 1000. * size / this->writeSpeed);
-}
-
 
 /**
  * Exibe informações referentes ao disco.
  */
 void Disk::info() {
     std::cout << "=== Disco ===" << std::endl;
-    std::cout << "Tamanho total: " << this->size << " MB" << std::endl;
+    std::cout << "Tamanho total: " << this->totalSize << " MB" << std::endl;
     std::cout << "Velocidade de leitura: " << std::setprecision(2) << this->readSpeed << " MB/s" << std::endl;
     std::cout << "Velocidade de escrita: " << std::setprecision(2) << this->writeSpeed << " MB/s" << std::endl;
     std::cout << "Total de leituras feitas: " << std::setprecision(2) << this->totalRead << " MB" << std::endl;
     std::cout << "Total de escritas feitas: " << std::setprecision(2) << this->totalWrite << " MB" << std::endl;
-
     std::cout << std::endl;
 }

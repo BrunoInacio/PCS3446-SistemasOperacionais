@@ -134,7 +134,8 @@ PredictedEvent EventsControl::IOComplete(PredictedEvent e) {
 
     this->OS->jobs.at(e.jobID)->state = State::READY;
 
-    auto newEvent = this->OS->disk->completeIO();
+    this->OS->disk->completeIO();
+    PredictedEvent newEvent = { e.jobID, 0, Event::CPU_RUN };
 
     if (auto chainEvent = this->OS->nextToDisk(); chainEvent.event != Event::NONE) {
         this->OS->jobs.at(chainEvent.jobID)->state = State::WAITING_IO;

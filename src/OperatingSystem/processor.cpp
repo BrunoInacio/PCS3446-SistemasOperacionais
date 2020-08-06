@@ -10,36 +10,34 @@
 
 
 /**
- * Inicia a execução de um 'job' e informa a próxima operação.
- * Retorna uma tupla referente ao próximo evento.
+ * Inicia a execução de um 'job'.
  */
-PredictedEvent Processor::run(std::shared_ptr<Job> job, int time) {
+Processor::Result Processor::run(std::shared_ptr<Job> job) {
     if (this->isRunning)
-        throw Error::CPU_UNAVAILABLE;
-    
-    this->time = time;
+        return Processor::Result::ERROR_CPU_UNAVAILABLE;
+  
     this->job = job;
     this->isRunning = true;
 
-    PredictedEvent nextEvent;
+    return Processor::Result::SUCCESS;
+}
 
-    switch (auto [timeUntil, operation, value] = this->job->getNextOperation(); operation) {
-    case Job::Operation::IO_READ:
-    case Job::Operation::IO_WRITE:
-        nextEvent = { this->job->id, timeUntil, Event::CPU_RELEASE };
-        break;
+/**
+ * Informa a próxima operação de parada a ser realizada.
+ */
+PredictedEvent Processor::getNextRelease() {
+    switch (const auto& op = this->job->getNextOperation(); op.operation) {
+    case Job::OperationType::IO_READ:
+    case Job::OperationType::IO_WRITE:
+        return { this->job->id, op.instant, Event::CPU_RELEASE };
 
-    case Job::Operation::FINISH:
-        nextEvent = { this->job->id, timeUntil, Event::CPU_DONE };
-        break;
+    case Job::OperationType::FINISH:
+        return { this->job->id, op.instant, Event::CPU_DONE };
 
     default:
         throw "Operação não reconhecida na CPU.";
     }
-
-    return nextEvent;
 }
-
 
 /**
  * Libera o uso da CPU e atualiza o 'job' para o ponto onde a CPU
@@ -49,21 +47,21 @@ PredictedEvent Processor::run(std::shared_ptr<Job> job, int time) {
  */
 PredictedEvent Processor::release(int time) {
     if (!isRunning)
-        throw "Tentativa de parar a CPU quando ela já estava parada.";
+        return { 0, 0, Event::NONE };
 
     PredictedEvent nextEvent = { this->job->id, 0, Event::CPU_RUN };
 
-    if (auto [timeUntil, operation, value] = this->job->getNextOperation(); timeUntil == time - this->time) {
-        switch (operation) {
-        case Job::Operation::IO_READ:
+    if (const auto& op = this->job->getNextOperation(); op.instant == time) {
+        switch (op.operation) {
+        case Job::OperationType::IO_READ:
             nextEvent = { this->job->id, 0, Event::IO_START_READ };
             break;
 
-        case Job::Operation::IO_WRITE:
+        case Job::OperationType::IO_WRITE:
             nextEvent = { this->job->id, 0, Event::IO_START_WRITE };
             break;
 
-        case Job::Operation::FINISH:
+        case Job::OperationType::FINISH:
             nextEvent = { this->job->id, 0, Event::MEM_FREE };
             break;
 
@@ -72,10 +70,9 @@ PredictedEvent Processor::release(int time) {
         }
     }
 
-    this->job->process(time - this->time);
+    this->job->process(time);
 
     this->job = nullptr;
-    this->time = time;
     this->isRunning = false;
 
     return nextEvent;
@@ -86,6 +83,7 @@ PredictedEvent Processor::release(int time) {
  */
 void Processor::info() {
     std::cout << "=== Processador ===" << std::endl;
+    
     if (this->isRunning)
         std::cout << "Job atual: " << this->job->id << "." << std::endl;
     else

@@ -13,46 +13,43 @@
 
 /**
  * Realiza a alocação do job referente ao 'id' e que possui tamanho 'size'.
- * Se a memória não possuir espaço livre o suficiente será lançada uma exceção para o SO.
+ * Se a memória não possuir espaço livre o suficiente será retornado um erro.
  */
-void Memory::allocate(int jobID, int size) {
-    if (size > this->totalSpace - this->usedSpace)
-        throw Error::MEMORY_FULL;
+Memory::Result Memory::allocate(int jobID, int size) {
+    if (size + this->usedSpace > this->totalSpace)
+        return Memory::Result::ERROR_MEMORY_FULL;
 
     this->usedSpace += size;
-    this->mem.insert({ jobID, size });
-}
+    this->content.insert({ jobID, size });
 
+    return Memory::Result::SUCCESS;
+}
 
 /**
  * Remove o job 'id' da memória e libera o espaço utilizado.
  */
-void Memory::free(int jobID) {
-    this->usedSpace -= this->mem.at(jobID);
-    this->mem.erase(jobID);
-}
+Memory::Result Memory::free(int jobID) {
+    this->usedSpace -= this->content.at(jobID);
+    this->content.erase(jobID);
 
+    return Memory::Result::SUCCESS;
+}
 
 /**
  * Exibe o estado atual da memória.
  */
 void Memory::info() {
     std::cout << "=== Memoria Principal ===" << std::endl;
-    std::cout << std::setw(4) << this->usedSpace << "/" << this->totalSpace
+    std::cout << std::setw(4) 
+        << this->usedSpace << "/" << this->totalSpace
         << " MB em uso\n" << std::endl;
+
     std::cout << "  ID | Memoria em uso" << std::endl;
 
-    for (const auto& process : this->mem)
-        std::cout << std::setw(4) << process.first << std::setw(14) << process.second
+    for (const auto& job : this->content)
+        std::cout << std::setw(4)
+        << job.first << std::setw(14) << job.second
         << " MB" << std::endl;
 
     std::cout << std::endl;
-}
-
-
-/**
- * Retorna um unordered_map com as informações referentes à memória.
- */
-std::unordered_map<int, int> Memory::getInfo() const {
-    return this->mem;
 }
