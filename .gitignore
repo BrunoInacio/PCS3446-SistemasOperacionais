@@ -1,7 +1,3 @@
 /x64
 /vcxproj/x64
 /.vs
-/programs/*.obj
-/programs/*.labels
-/programs/*.lst
-/programs/*.bin

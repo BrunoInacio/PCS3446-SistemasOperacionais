@@ -1,6 +1,6 @@
 /**
  * event.hpp
- * PCS 3216 - Sistemas Operacionais - 2019
+ * PCS 3446 - Sistemas Operacionais - 2019
  * Bruno Brandão Inácio
  */
 

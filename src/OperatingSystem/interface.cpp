@@ -1,6 +1,6 @@
 /**
  * interface.cpp
- * PCS 3216 - Sistemas Operacionais - 2019
+ * PCS 3446 - Sistemas Operacionais - 2019
  * Bruno Brandão Inácio
  */
 
@@ -22,7 +22,7 @@
   */
 void Interface::start() {
     std::cout << "Bem vindo ao Sistema Operacional!" << std::endl;
-    this->addMachine();
+    this->createMachine();
 
     this->menu();
 }
@@ -31,7 +31,7 @@ void Interface::start() {
 /**
  * Adiciona hardware para o sistema que será simulado.
  */
-void Interface::addMachine() {
+void Interface::createMachine() {
     this->events.addOS(OperatingSystem());
 
     this->events.OS->addProcessor(Processor());
